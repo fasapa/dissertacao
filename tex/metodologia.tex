@@ -1,1 +1,11 @@
 \chapter{Metodologia}\label{chp:metodologia}
+Teoria de tipos dependentes.
+
+Termos convertíveis são iguais no Coq. Tipo indutivo eq. ``='' é a igualdade padrão no Coq ``$\equiv$'' igualdade \textit{setoid}. Pode-se substituir termos iguais em qualquer expressão pois eles são convertíveis (igualdade de Leibniz).
+Mas ao introduzir uma noção diferente de equivalência, aonde termos não convertíveis são equivalentes, limitamos a reescrita
+apenas somente a subtermos que são argumentos de funções que respeitam a equivalência, chamadas de funções próprias em relação a equivalência. A igualdade é ``forte'' demais, em alguns casos temos objetos que são conceitualmente iguais, mas sintaticamente diferentes. A igualdade no Coq é sintática. Coq não tem tipos quocientes (e não é uma boa ideia implementar PROCURAR REFERÊNCIA checagem de tipos indecidível), utiliza-se \textit{setoids} (conjuntos de Bishop). A substituição de subtermos equivalentes é chamado de reescrita de setoids, e é necessário o gerenciamento correto da aplicação de lemas próprios de funções e equivalências. Sem uma infraestrutura adequada as provas começam a ficar incontroláveis e grandes, aonde surge o setoid hell. Coq possui um mecanismo que da suporte a reescrita setoid baseado em classes de tipos.
+
+
+Falar sobre classes de tipos. É semelhante a implementação em Haskell (falar pq isso é legal tipos de classes), mas no Coq são cidadões de primeira classe graças a teoria de tipos dependentes. Classes são implementadas como records (registros) aliado a tipos implícitos e busca de provas. Registros em Coq são dependentes, ou seja, um membro do registro pode referenciar um membro anterior. Instâncias das classes são instâncias ordinárias dos registros, mas cada instância é registrada em um banco de dados de ``sugestões'' para a busca de provas (semelhante ao Haskell), entretanto Coq permite mais de uma instância de classe (contrário do Haskell), pois pode-se ter mais de uma instância de um registro.
+
+DIFERENÇA ENTRE SET E PROP

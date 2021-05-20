@@ -1,1 +1,17 @@
 \chapter{Formalização}\label{chp:formalizacao}
+
+\section{Átomos}
+O que nos interessa de nomes são seus identificadores, cadeia de caracteres, estrutura interna é irrelevante, por isso o chamamos de átomos, também são conhecidos como ``nomes puros''. Nomes são indivisíveis (opacos), infinitos contáveis com igualdade decidível. Não pode haver dúvidas quando dois nomes são iguais ou diferentes. Dado um conjunto \textbf{qualquer} de nomes \textbf{sempre} podemos obter um novo.
+% PQ TEM QUE SER CONTÁVEL?
+
+\begin{coqcode}
+	Class GAction `(Group G) (X : Type) `{Act : Action G X, Equiv X} : Prop := {
+		gact_setoid :> Equivalence(≡@{X});
+		gact_proper :> Proper ((≡@{G}) ==> (≡@{X}) ==> (≡@{X})) ();
+		gact_id : ∀ (x: X), ε@{G} • x ≡@{X} x;
+		gact_compat: ∀ (p q: G) (x: X), p  (q  x) ≡@{X} (q + p)  x
+	}.
+\end{coqcode}
+
+\section{Copello}
+\section{Pritam}

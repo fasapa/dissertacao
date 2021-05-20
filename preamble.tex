@@ -1,0 +1,17 @@
+% Matemática extra
+\usepackage{amsmath,amssymb,amsthm}
+
+% Formatação de código
+\usepackage{minted}
+\usepackage{etoolbox}
+\makeatletter
+\AtBeginEnvironment{minted}{\dontdofcolorbox}
+\def\dontdofcolorbox{\renewcommand\fcolorbox[4][]{##4}}
+\makeatother
+\newminted{coq}{autogobble=true,
+	linenos,
+	fontsize=\footnotesize,
+	style=bw}
+
+% Macros e comandos extras
+%\input{macros}
