@@ -1,8 +1,76 @@
 \chapter{Formalização}\label{chp:formalizacao}
 
-\section{Átomos}
+Uma introdução a formalização
+
+\section{Átomos e Permutação}
+O interessante sobre nome é seu identificador, nome do nome cadeia de caracteres assim como ponteiros, em outras linguagens de programação. Sua estrutura (implementação) dos é irrelevante, por isto são denominados átomos, outros autores dão nome de ``nomes puros''. Entretanto, como sempre precisamos de nomes frescos, é preciso uma fonte inesgotável e uma forma de distingui-los: átomos é um conjunto infinito contável com igualdade decidível. Módulos do Coq permite fornecer uma interface, definindo um tipo de módulo, capaz de ocultar (como uma máscara) a implementação de um módulo. Abaixo definimos um tipo de módulo \coqinline{ATOMIC} que esconde a implementação.
+\vspace*{.4em}\\
+\begin{minipage}[t]{0.5\linewidth}
+\begin{coqcode}
+Module Type ATOMIC.
+  Parameter t : Set.
+  Axiom cnt : Countable t.
+  Axiom dec : EqDecision t.
+  Axiom inf : Infinite t.
+End ATOMIC.
+
+Notation name := Atom.t
+Notation nameset := (listset name).
+\end{coqcode}
+\end{minipage}
+\hspace{-5em}
+\begin{minipage}[t]{0.5\linewidth}
+\begin{coqcode}
+Module Atom : ATOMIC.
+  Definition t := nat.
+  Instance cnt : Countable t := nat_countable.
+  Instance dec : EqDecision t := nat_eq_dec.
+  Instance inf : Infinite t := nat_infinite.
+End Atom.
+\end{coqcode}
+\end{minipage}
+\vspace*{1em}\\
+Implementamos átomos como naturais.
+Assinaturas (tipo de módulos) têm duas utilidades: garantir que um módulo implementa corretamente alguma regra e esconder informação. Somente declarações presentes na assinatura podem ser acessadas externa ao módulo. Como não estamos omitindo nenhuma definição, estamos escondendo a implementação de átomo. portanto Atom.t é abstrato.
+À esquerda definimos um novo tipo de módulo, denominado \coqinline{ATOMIC}, com um tipo abstrato \coqinline{t}, com instâncias nas classes \coqinline{EqDecision}, igualdade decidível, e \coqinline{Infinite}.
+Construímos um novo tipo abstrato \coqinline{Atom.t} com igualdade decidível \coqinline{Atom.dec} e infinito \coqinline{Atom.inf} no qual chamamos de \coqinline{name}. \coqinline{nameset} conjunto finito de nomes representado por uma lista. \fabricio{Explicar as type classes EqDecision e Infinite, que propriedades elas agregram ao desenvolvimento. Por exemplo EqDecision dá acesso a \texttt{decide} a partir de uma proposição, enquanto Infinite da acesso a \texttt{fresh} para gerar uma átomo novo}.
+
+Permutações é representado por uma lista de pares de nomes: Porque agora esse trem ficou longe?
+\begin{coqcode}
+Notation perm := (list (name * name)).
+Notation "⟨ a , b ⟩" := (@cons (name * name) (a,b) (@nil _)).
+Definition swap '(a,b) : name → name :=
+  λ c, if decide (a = c) then b else if decide (b = c) then a else c.
+Definition swap_perm (p: perm): name → name :=
+  λ a, foldl (λ x y, swap y x) a p.
+Instance perm_equiv: Equiv perm :=
+  λ p q, ∀ a, swap_perm p a = swap_perm q a.
+\end{coqcode}
+O comando @ desativa o mecanismo de variáveis implícitas do Coq para fornecermos manualmente todos os parâmetros.
+
+
+
+
+Entretanto, precisamos garantir as algumas propriedades:  um conjunto infinito contável  distinguíveis.
+
+ nomes é um conjunto infinito e contável.
+
+sendo sua estrutura irrelevante.
+
+estamos interessados apenas nos identificadores que os nomes carregam
+
+
+
+Nomes na teoria nominal, é um conjunto infinito e contável.
+
+Nomes, uma das peças centrais da teoria nominal, tem uma implementação trivial. As características que nos interessam são:
+
+
+
 O que nos interessa de nomes são seus identificadores, cadeia de caracteres, estrutura interna é irrelevante, por isso o chamamos de átomos, também são conhecidos como ``nomes puros''. Nomes são indivisíveis (opacos), infinitos contáveis com igualdade decidível. Não pode haver dúvidas quando dois nomes são iguais ou diferentes. Dado um conjunto \textbf{qualquer} de nomes \textbf{sempre} podemos obter um novo.
 % PQ TEM QUE SER CONTÁVEL?
+
+Implementação de permutação e átomos é a mesma para ambos.
 
 \begin{coqcode}
 	Class GAction `(Group G) (X : Type) `{Act : Action G X, Equiv X} : Prop := {

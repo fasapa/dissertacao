@@ -8,10 +8,16 @@
 \AtBeginEnvironment{minted}{\dontdofcolorbox}
 \def\dontdofcolorbox{\renewcommand\fcolorbox[4][]{##4}}
 \makeatother
-\newminted{coq}{autogobble=true,
-	linenos,
-	fontsize=\footnotesize,
-	style=bw}
+\newlength{\fancyvrbtopsep}
+\newlength{\fancyvrbpartopsep}
+\makeatletter
+\FV@AddToHook{\FV@ListParameterHook}{\topsep=\fancyvrbtopsep\partopsep=\fancyvrbpartopsep}
+\makeatother
+\setlength{\fancyvrbtopsep}{0pt}
+\setlength{\fancyvrbpartopsep}{0pt}
+
+\newminted{coq}{autogobble=true, linenos=false, fontsize=\footnotesize, style=bw}
+\newmintinline{coq}{fontsize=\footnotesize, style=bw}
 
 % Macros e comandos extras
-%\input{macros}
+\input{macros}
