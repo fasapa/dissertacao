@@ -1,9 +1,18 @@
 \chapter{Formalização}\label{chp:formalizacao}
 
-Uma introdução a formalização
+Neste capítulo apresento, primeiramente, a implementação de átomos e permutações, pois ambas as formalizações seguintes compartilham da mesma implementação, seção \ref{sec:atomos-permutacao}, junto com duas formalizações, no assistente de provas Coq, baseadas nos trabalhos de Copello \textit{et. al.} \cite{Copello2016}, seção \ref{sec:copello}, e Choudhury \cite{Choudhury2015}, seção \ref{sec:choudhury}, ambos em Agda. A primeira formalização está relacionado a uma classe de implementações pragmáticas, também denominadas de ``técnicas nominais'' \cite{Copello2016,Copello2018,Ambal2020,Tasistro2015,Aydemir2007}, enquanto a segunda, pertence ao grupo de formalizações de conjuntos nominais, ou sintaxe abstrata nominal \cite{AyalaRincon2019,Choudhury2015}.
 
-\section{Átomos e Permutação}
-O interessante sobre nome é seu identificador, nome do nome cadeia de caracteres assim como ponteiros, em outras linguagens de programação. Sua estrutura (implementação) dos é irrelevante, por isto são denominados átomos, outros autores dão nome de ``nomes puros''. Entretanto, como sempre precisamos de nomes frescos, é preciso uma fonte inesgotável e uma forma de distingui-los: átomos é um conjunto infinito contável com igualdade decidível. Módulos do Coq permite fornecer uma interface, definindo um tipo de módulo, capaz de ocultar (como uma máscara) a implementação de um módulo. Abaixo definimos um tipo de módulo \coqinline{ATOMIC} que esconde a implementação.
+Inicialmente, optei pela técnica nominal adotada por Copello \textit{et. al.}, aonde as principais características são: considerar a permutação de nomes como uma operação básica, por exemplo ao definir substituição de termos ou $\alpha$-equivalência, pois esta apresenta um melhor comportamento, devido a impossibilidade da captura de variável livre, simplificando a verificação. Outro ponto importante, no trabalho de Copello, é a derivação de um princípio de indução/recursão $\alpha$-estrutural, simulando efetivamente a BVC.
+Todavia, como verificado em minhas investigações e outros trabalhos \cite{Aydemir2008}, a falta de uma formalização da teoria nominal, ou uma biblioteca mecanizada/automatizada de infraestrutura, acarreta desenvolvimentos desagradáveis, focado em sistemas isolados, pois a adição de outros para análise, por exemplo no estudo de codificações, implicaria na repetição de código. Portanto, alterei o foco do projeto para a investigação da formalização de conjuntos nominais em Coq, apoiado no trabalho de Choudhury, como uma biblioteca de suporte, para projetos futuros.
+
+% O conjunto dos pragmatistas veem operações baseadas em permutação de nomes como uma ``boa ideia''. Isto, se deve ao fato da permutação de nomes se comportar melhor do que a substituição, pois nesta pode ocorrer captura de variável livre, enquanto a permutação é livre deste problema. Entretanto, tais trabalhos, geralmente, ficam restritos a uma um único sistema, devido a falta de mecanização e automação. Urban \cite{Urban2008}
+
+%Urban está no meio das duas escolas (compromisso).
+
+\section{Átomos e Permutação}\label{sec:atomos-permutacao}
+Definimos nomes como estruturas atômicas, ou seja, indivisíveis. A estrutura interna dos átomos é irrelevante, pois estamos interessados apenas em seus identificadores, assim como ponteiros em algumas linguagens de programação. No entanto, certas condições precisam ser satisfeitas: conjunto de nomes deve ser infinito, contável e com igualdade decidível. Dessa forma, é possível obter um nome novo (\textbf{fresco}) e decidir quando dois nomes são diferentes ou iguais, sob quaisquer circunstâncias.
+
+Módulos e assinaturas do Coq, permitem definir estruturas de dados abstratas, ideal para implementação de átomos. Enquanto módulos são semelhantes a outras implementações em linguagens de programação convencionais, no sentindo de agrupar definições sobre um único nome, assinaturas tem origem na linguagem OCaML, na qual permitem: ocultar, limitar o acesso e visibilidade do conteúdo externo ao módulo. Abaixo segue a implementação de átomos através desta técnica:
 \vspace*{.4em}\\
 \begin{minipage}[t]{0.5\linewidth}
 \begin{coqcode}
@@ -13,9 +22,7 @@ Module Type ATOMIC.
   Axiom dec : EqDecision t.
   Axiom inf : Infinite t.
 End ATOMIC.
-
 Notation name := Atom.t
-Notation nameset := (listset name).
 \end{coqcode}
 \end{minipage}
 \hspace{-5em}
@@ -30,12 +37,16 @@ End Atom.
 \end{coqcode}
 \end{minipage}
 \vspace*{1em}\\
-Implementamos átomos como naturais.
-Assinaturas (tipo de módulos) têm duas utilidades: garantir que um módulo implementa corretamente alguma regra e esconder informação. Somente declarações presentes na assinatura podem ser acessadas externa ao módulo. Como não estamos omitindo nenhuma definição, estamos escondendo a implementação de átomo. portanto Atom.t é abstrato.
-À esquerda definimos um novo tipo de módulo, denominado \coqinline{ATOMIC}, com um tipo abstrato \coqinline{t}, com instâncias nas classes \coqinline{EqDecision}, igualdade decidível, e \coqinline{Infinite}.
-Construímos um novo tipo abstrato \coqinline{Atom.t} com igualdade decidível \coqinline{Atom.dec} e infinito \coqinline{Atom.inf} no qual chamamos de \coqinline{name}. \coqinline{nameset} conjunto finito de nomes representado por uma lista. \fabricio{Explicar as type classes EqDecision e Infinite, que propriedades elas agregram ao desenvolvimento. Por exemplo EqDecision dá acesso a \texttt{decide} a partir de uma proposição, enquanto Infinite da acesso a \texttt{fresh} para gerar uma átomo novo}.
+O módulo \coqinline{Atom} agrupa a definição de átomo \coqinline{t}, juntamente com suas propriedades, via classes de tipos: \coqinline{cnt}, \coqinline{dec} e \coqinline{inf}, respectivamente provas da contabilidade, decidibilidade e infinitude. Átomos são implementados como naturais, pois estes possuem as mesmas propriedades esperadas para átomos. Afim de ocultar a implementação, aplica-se a assinatura \coqinline{ATOMIC} ao módulo \coqinline{Atom}, definindo-o como um conjunto qualquer, pertencente ao universo \coqinline{Set}. Ao longo da formalização utilizo a palavra-chave \coqinline{name} como apelido para \coqinline{Atom.t}.
+\fabricio{Dizer oq Countable, EqDecision e Infinite fazem exatamente?}
 
-Permutações é representado por uma lista de pares de nomes: Porque agora esse trem ficou longe?
+%Implementamos átomos como naturais.
+%Assinaturas (tipo de módulos) têm duas utilidades: garantir que um módulo implementa corretamente alguma regra e esconder informação. Somente declarações presentes na assinatura podem ser acessadas externa ao módulo. Como não estamos omitindo nenhuma definição, estamos escondendo a implementação de átomo. portanto Atom.t é abstrato.
+%À esquerda definimos um novo tipo de módulo, denominado \coqinline{ATOMIC}, com um tipo abstrato \coqinline{t}, com instâncias nas classes \coqinline{EqDecision}, igualdade decidível, e \coqinline{Infinite}.
+%Construímos um novo tipo abstrato \coqinline{Atom.t} com igualdade decidível \coqinline{Atom.dec} e infinito \coqinline{Atom.inf} no qual chamamos de \coqinline{name}. \coqinline{nameset} conjunto finito de nomes representado por uma lista. \fabricio{Explicar as type classes EqDecision e Infinite, que propriedades elas agregram ao desenvolvimento. Por exemplo EqDecision dá acesso a \texttt{decide} a partir de uma proposição, enquanto Infinite da acesso a \texttt{fresh} para gerar uma átomo novo}.
+%Countable dá acesso a função choice: dado uma prova $\exists x, P x$ obtemos um programa $\{x | P x\}$ tipo $\Sigma$. Eqdecision dá acesso a decide: relaciona uma relação a um procedimento decidível para esta relação. Infinite da acesso a fresh: dado um conjunto obtemos um novo que não pertence a este conjunto.
+
+A representação de permutações, e função de transposição, não tem segredos, sendo bastante similar a definida no capítulo \fabricio{REFERENCIAL TEORICO}:
 \begin{coqcode}
 Notation perm := (list (name * name)).
 Notation "⟨ a , b ⟩" := (@cons (name * name) (a,b) (@nil _)).
@@ -45,41 +56,120 @@ Definition swap_perm (p: perm): name → name :=
   λ a, foldl (λ x y, swap y x) a p.
 Instance perm_equiv: Equiv perm :=
   λ p q, ∀ a, swap_perm p a = swap_perm q a.
+Instance perm_equivalence: Equivalence perm_equiv. Proof. (* ... *) Qed.
 \end{coqcode}
-O comando @ desativa o mecanismo de variáveis implícitas do Coq para fornecermos manualmente todos os parâmetros.
+Além da representação autoexplicativa \coqinline{perm}, a notação \coqinline{⟨a,b⟩} é útil ao referenciar permutações com um único par de nomes.
 
+Como discutido anteriormente (\fabricio{QUAL SEÇÃO?}), a representação de permutações não é única. Para isto defino uma relação de equivalência \coqinline{perm_equiv}, que iguala duas permutações se estas produzem o mesmo resultado sobre todos os nomes, com uma prova (\coqinline{perm_equivalence}) de que realmente é uma equivalência (reflexividade, simetria e transitividade).
+\section{Copello \textit{et. al.}}\label{sec:copello}
+O ponto central dos trabalhos de Copello \textit{et. al.} \cite{Copello2016,Copello2018} é a derivação de um princípio de indução/recursão $\alpha$-estrutural para o \lcalc~em uma teoria de tipos construtiva (Agda), sem a necessidade de uma representação para classe de $\alpha$-equivalência. Os únicos requisitos são: a existência da ação de permutação, sobre os termos do cálculo, e $\alpha$-equivalência definido via permutação de nomes.  Copello \textit{et. al.} observa que propriedades/funções, sobre a classe de $\alpha$-equivalência são invariantes para membros da mesma, denominado $\alpha$-compatibilidade (definição \ref{def:alpha-compatibilidade}). Dessa forma, ao aplicar uma propriedade, ou função, da classe, pode-se escolher um membro apropriado (via permutação de nomes), ou seja fresco, efetivamente simulando a BVC.
+\begin{definicao}[$\alpha$-Compatibilidade]\label{def:alpha-compatibilidade}
+Um predicado $P$, sobre os termos do \lcalc~é dito $\alpha$-compatível se, dados $M$ e $N$ $\alpha$-equivalentes, implica $\pred{P}{M} \leftrightarrow \pred{P}{N}$.
+Uma função $F$, sobre os termos do \lcalc~é dito fortemente $\alpha$-compatível se, dados $M$ e $N$ $\alpha$-equivalentes, implica $F(M) = F(N)$.
+\end{definicao}
 
-
-
-Entretanto, precisamos garantir as algumas propriedades:  um conjunto infinito contável  distinguíveis.
-
- nomes é um conjunto infinito e contável.
-
-sendo sua estrutura irrelevante.
-
-estamos interessados apenas nos identificadores que os nomes carregam
-
-
-
-Nomes na teoria nominal, é um conjunto infinito e contável.
-
-Nomes, uma das peças centrais da teoria nominal, tem uma implementação trivial. As características que nos interessam são:
-
-
-
-O que nos interessa de nomes são seus identificadores, cadeia de caracteres, estrutura interna é irrelevante, por isso o chamamos de átomos, também são conhecidos como ``nomes puros''. Nomes são indivisíveis (opacos), infinitos contáveis com igualdade decidível. Não pode haver dúvidas quando dois nomes são iguais ou diferentes. Dado um conjunto \textbf{qualquer} de nomes \textbf{sempre} podemos obter um novo.
-% PQ TEM QUE SER CONTÁVEL?
-
-Implementação de permutação e átomos é a mesma para ambos.
-
+Com isso é possível derivar um princípio de indução (\coqinline{term_aeq_rect}) $\alpha$-estrutural para propriedades $\alpha$-compatíveis (\coqinline{αCompat}):
 \begin{coqcode}
-	Class GAction `(Group G) (X : Type) `{Act : Action G X, Equiv X} : Prop := {
-		gact_setoid :> Equivalence(≡@{X});
-		gact_proper :> Proper ((≡@{G}) ==> (≡@{X}) ==> (≡@{X})) ();
-		gact_id : ∀ (x: X), ε@{G} • x ≡@{X} x;
-		gact_compat: ∀ (p q: G) (x: X), p  (q  x) ≡@{X} (q + p)  x
-	}.
+Definition term_aeq_rect:
+  ∀ P: Λ → Type, αCompat P →
+    (∀ a, P 'a) →
+    (∀ m n, P m → P n → P (m × n)) →
+    {L & ∀ m a, a ∉ L → P m → P (\a ⋅ m)} →
+    ∀ m, P m.
+Proof. (* ... *) Qed.
 \end{coqcode}
+Para simplificação, omito a definição dos termos do \lcalc~(\coqinline{Λ}), representada pelas notações: \coqinline{'a} para variável, \coqinline{m × n} aplicação e \coqinline{\a ⋅ m} abstração. A definição \coqinline{term_aeq_rect} é bem similar ao princípio de indução na estrutura dos termos do \lcalc, com exceção do caso da abstração. A notação \coqinline{{a: A & T a}} introduz um tipo $\Sigma$, ou subconjunto, com \coqinline{T: A → Type}. Sua interpretação depende se estamos utilizando como princípio de indução ou recursão. No caso da indução, temos a garantia de que a variável ligada é suficientemente fresca para um conjunto de nomes \coqinline{L}. Já para recursão, ela permite escolher um nome diferente do conjunto, fornecido pelo usuário, em meio a recursão, como pode ser visto abaixo, no operador de recursão \coqinline{LIt}, que sempre produz funções fortemente $\alpha$-compatíveis (\coqinline{LItStrongCompat}):
+\begin{coqcode}
+Definition LIt {A: Type} (L: nameset) (l: Λ)
+           (fvar: name → A) (fapp: A → A → A) (fabs: atom → A → A) : A :=
+  term_aeq_rect (λ _, A) (λ _ _ _, id) hv (λ _ _, hp)
+                (existT _ L (λ _ b _ r, fabs b r)) l.
+Lemma LItStrongCompat {A} fvar fapp fabs L:
+  αStrongCompat (@LIt A fvar fapp fabs L).
+\end{coqcode}
+Para utilizar o princípio é necessário definir as funções para cada construtor do \lcalc: \coqinline{fvar}, \coqinline{fapp} e \coqinline{fabs} e um conjunto \coqinline{L} de nomes a serem evitados. Por exemplo, a substituição de termos é definida como:
+\begin{coqcode}
+Definition subst_term (M N: Λ) (a: name): Λ :=
+  let L := ({a} ∪ fv N ∪ fv M) in (* fv = support *)
+  @LIt Λ (λ b, if decide (a = b) then N else 'b) App Abs L M.
+Notation " '[' a ':=' N ']' M " := (subst_term M N a)
+\end{coqcode}
+No caso da abstração não é necessário verificar a captura de variável livre, pois temos a garantia de que as variáveis ligadas serão sempre diferentes do conjunto \coqinline{L}, portanto passamos como argumento seu construtor \coqinline{Abs}, para propagar a recursão ao corpo da abstração.
 
-\section{Copello}
-\section{Pritam}
+Estamos limitados a uma única estrutura, para outras é necessário reimplementar toda teoria!
+
+Entretanto algumas provas crescem bastante, com aplicações não triviais de transitividade, tornando-as longas e complexas. Uma grande vantagem é não precisar de uma representação da $\alpha$-classe de equivalência.
+
+
+\section{Pritam (Quais titulos?)}\label{sec:choudhury}
+A repetição de código para diferentes estruturas, devido ao método anterior de Copello, traz uma questão interessante sobre formalizar conjuntos nominais antes de aplicar seu método. Com uma biblioteca já fundamentada sobre conjuntos nominais boa parte seria reaproveitada para desenvolvimentos futuros, quem sabe até mecanizada. Porém a formalização de conjuntos nominais em lógicas construtivas apresentam seus próprios desafios. Aqui apresentamos o desenvolvimento de uma formalização de conjuntos nominais bem próxima a apresentada por Pritam. Com a diferença de aproveitarmos algums mecanismos presentes no Coq que possibilitam uma formalização mais simples, próxima ao desenvolvimento da metateoria por meios tradicionais. Pritam descreve dois desafios à esta formalização: a não construtividade do menor suporte finito e trabalhar com \setoids.
+
+Não seria possível desenvolver a teoria, como nos trabalhos de Urban, livre de axiomas. Uma das noções centrais, funções são tipos de permutação, podem ser demonstrados apenas assumindo a extensionalidade funcional. É importante frisar que extensionalidade não é incompatível com a lógica do Coq, podendo ser incluída como axioma. Entretanto introduzimos um caráter não computacional a formalização, que posteriormente possa impossibilitar extração de código. Ainda, é importante notar que é possível trabalhar com os dois, extensionalidade e extração sem prejudicar, como é feito pela extensão Program do Coq, mas isto está fora do escopo deste trabalho. Portanto optamos por trabalhar com \setoids durante toda a formalização. O que nos diferencia de Pritam é a aplicação de tipos de classes e reescrita generalizada, para alcançar uma formalização mais simples, enxuta, similar as provas de papel e caneta para a metateoria.
+
+Seguimos um modelo proposto por ... para definição das classes de tipos, sendo elas dividas em duas. As classes operacionais servem como referência as operações e notações utilizadas no segundo tipo de classe, fornecendo um nome canônico, uma forma de referenciar as operações. As classes predicados implementam as restrições da classe de tipo em específico, similarmente em Haskell. Um método denominado \textit{unbundle}.
+
+Afim de mostrar que a permutação definida acima, implementa permutação mostramos que ela forma um grupo de permutação. Primeiro as classes de predicado e respectivas notações:
+\vspace*{.4em}\\
+\begin{minipage}[t]{0.5\linewidth}
+\begin{coqcode}
+Class Neutral A := neutral : A.
+Class Operator A := op: A → A → A.
+Class Inverse A := inv : A → A.
+\end{coqcode}
+\end{minipage}
+\hspace{-1em}
+\begin{minipage}[t]{0.5\linewidth}
+\begin{coqcode}
+Notation ɛ := neutral.
+Infix "+" := op.
+Notation "- x" := (inv x).
+\end{coqcode}
+\end{minipage}
+\vspace*{1em}\\
+E a definição de Grupo (omitindo parte da implementação):
+\begin{coqcode}
+Class Group (A : Type)
+   `{Ntr: Neutral A, Opr: Operator A, Inv: Inverse A, Equiv A} : Prop := {
+  grp_setoid :> Equivalence(≡@{A});
+  grp_op_proper :> Proper ((≡@{A}) ⇒ (≡@{A}) ⇒ (≡@{A})) (+);
+  grp_inv_proper :> Proper ((≡@{A}) ⇒ (≡@{A})) (-);
+
+  grp_assoc : ∀ (x y z : A), x + (y + z) ≡@{A} (x + y) + z;
+  (* ... *)
+}.
+Instance PermGrp: Group perm. Proof. (* ... *) Qed.
+\end{coqcode}
+A definição \coqinline{Group} pode ser lido da seguinte forma: o tipo \coqinline{A} forma um grupo, se dado um elemento neutro, uma operação binária e uma opera unária inverso, ele satisfaz os axiomas padrão de grupo. Além disso queremos garantir que a relação seja uma equivalência, e que a operação binária e unária respeitem a equivalência (\coqinline{grp_op_proper} e \coqinline{grp_inv_proper}). Ao estabelecermos as propriedades Proper, indicamos ao Coq que é seguro fazer a reescrita no contexto das funções, desde que os termos reescritos sejam equivalentes. Dessa forma conseguimos demonstrar propriedades para as classes idênticas as provas tradicionais, simplificando a formalização: \fabricio{TALVES SEJA MAIS INTERESSANTE MOSTRAR UM LEMMA DE AÇÃO DE GRUPO}
+\vspace*{.4em}\\
+%\hspace*{-1em}
+\begin{minipage}[t]{0.5\linewidth}
+\begin{corolario}
+Seja $x \in G$, tal que $G$ é um grupo. A operação inversa é involutiva:
+\begin{align*}
+                               & & x& \equiv\\
+   \text{\textup{id. esquerda}}& & \varepsilon + x& \equiv\\
+   \text{\textup{inv. esquerda}}& & (-(-x) + -x) + x& \equiv\\
+   \text{\textup{associatividade}}& & -(-x) + (-x + x)& \equiv\\
+   \text{\textup{inv. esquerda}}& & -(-x) + \varepsilon& \equiv\\
+   \text{\textup{id. direita}}& & -(-x) &
+\end{align*}
+\end{corolario}
+\end{minipage}
+\hspace{1em}
+\begin{minipage}[t]{0.5\linewidth}
+\begin{coqcode}
+Lemma grp_inv_involutive
+  (x: G) `{Group G}: -(-x) ≡ x.
+Proof with auto.
+
+
+rewrite <-(grp_left_id x) at 2;
+rewrite <-grp_left_inv;
+rewrite <-grp_assoc;
+rewrite grp_left_inv;
+rewrite grp_right_id...
+
+Qed.
+\end{coqcode}
+\end{minipage}
+

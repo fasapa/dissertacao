@@ -4,10 +4,11 @@
 
 \documentclass[
 	% -- opções da classe memoir --
+   draft,
 	12pt,				% tamanho da fonte
 	openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
 	twoside,			% para impressão em recto e verso. Oposto a oneside
-	a4paper,			% tamanho do papel. 
+	a4paper,			% tamanho do papel.
 	% -- opções da classe abntex2 --
 	%chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
 	%section=TITLE,		% títulos de seções convertidos em letras maiúsculas
@@ -21,12 +22,12 @@
 	]{abntex2}
 
 % ---
-% Pacotes básicos 
+% Pacotes básicos
 % ---
 \usepackage{fontspec}
 \setmainfont{Latin Modern Roman}
 \setmonofont{DejaVu Sans Mono}
-%\usepackage{lmodern}			% Usa a fonte Latin Modern			
+%\usepackage{lmodern}			% Usa a fonte Latin Modern
 %\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
 %\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
 \usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
@@ -35,16 +36,16 @@
 \usepackage{microtype} 			% para melhorias de justificação
 \usepackage{lipsum}
 % ---
-		
+
 % ---
 % Pacotes de citações
 % ---
 \usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
-\usepackage[alf]{abntex2cite}	% Citações padrão ABNT
+\usepackage[num]{abntex2cite}	% Citações padrão ABNT
 
-% --- 
+% ---
 % CONFIGURAÇÕES DE PACOTES
-% --- 
+% ---
 
 % ---
 % Configurações do pacote backref
@@ -79,8 +80,8 @@
   \par
   Programa de Pós-Graduação}
 \tipotrabalho{Tese (Doutorado)}
-% O preambulo deve conter o tipo do trabalho, o objetivo, 
-% o nome da instituição e a área de concentração 
+% O preambulo deve conter o tipo do trabalho, o objetivo,
+% o nome da instituição e a área de concentração
 \preambulo{Modelo canônico de trabalho monográfico acadêmico em conformidade com
 as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 % ---
@@ -96,11 +97,11 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 \makeatletter
 \hypersetup{
      	%pagebackref=true,
-		pdftitle={\@title}, 
+		pdftitle={\@title},
 		pdfauthor={\@author},
     	pdfsubject={\imprimirpreambulo},
 	    pdfcreator={LaTeX with abnTeX2},
-		pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico}, 
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico},
 		colorlinks=true,       		% false: boxed links; true: colored links
     	linkcolor=blue,          	% color of internal links
     	citecolor=blue,        		% color of links to bibliography
@@ -109,7 +110,7 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 		bookmarksdepth=4
 }
 \makeatother
-% --- 
+% ---
 
 % ---
 % Posiciona figuras e tabelas no topo da página quando adicionadas sozinhas
@@ -133,15 +134,15 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 % configurações para atender às regras da ABNT
 \setfloatadjustment{quadro}{\centering}
 \counterwithout{quadro}{chapter}
-\renewcommand{\cftquadroname}{\quadroname\space} 
+\renewcommand{\cftquadroname}{\quadroname\space}
 \renewcommand*{\cftquadroaftersnum}{\hfill--\hfill}
 
 \setfloatlocations{quadro}{hbtp} % Ver https://github.com/abntex/abntex2/issues/176
 % ---
 
-% --- 
-% Espaçamentos entre linhas e parágrafos 
-% --- 
+% ---
+% Espaçamentos entre linhas e parágrafos
+% ---
 
 % O tamanho do parágrafo é dado por:
 \setlength{\parindent}{1.3cm}
@@ -170,7 +171,7 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 \selectlanguage{brazil}
 
 % Retira espaço extra obsoleto entre as frases.
-\frenchspacing 
+\frenchspacing
 
 % ----------------------------------------------------------
 % ELEMENTOS PRÉ-TEXTUAIS
@@ -195,7 +196,7 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 % ---
 
 % Isto é um exemplo de Ficha Catalográfica, ou ``Dados internacionais de
-% catalogação-na-publicação''. Você pode utilizar este modelo como referência. 
+% catalogação-na-publicação''. Você pode utilizar este modelo como referência.
 % Porém, provavelmente a biblioteca da sua universidade lhe fornecerá um PDF
 % com a ficha catalográfica definitiva após a defesa do trabalho. Quando estiver
 % com o documento, salve-o como PDF no diretório do seu projeto e substitua todo
@@ -213,18 +214,18 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 %	\small
 %	\imprimirautor
 %	%Sobrenome, Nome do autor
-%	
+%
 %	\hspace{0.5cm} \imprimirtitulo  / \imprimirautor. --
 %	\imprimirlocal, \imprimirdata-
-%	
+%
 %	\hspace{0.5cm} \thelastpage p. : il. (algumas color.) ; 30 cm.\\
-%	
+%
 %	\hspace{0.5cm} \imprimirorientadorRotulo~\imprimirorientador\\
-%	
+%
 %	\hspace{0.5cm}
 %	\parbox[t]{\textwidth}{\imprimirtipotrabalho~--~\imprimirinstituicao,
 %	\imprimirdata.}\\
-%	
+%
 %	\hspace{0.5cm}
 %		1. Palavra-chave1.
 %		2. Palavra-chave2.
@@ -232,7 +233,7 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 %		I. Orientador.
 %		II. Universidade xxx.
 %		III. Faculdade de xxx.
-%		IV. Título 			
+%		IV. Título
 %	\end{minipage}}
 %	\end{center}
 %\end{fichacatalografica}
@@ -290,22 +291,22 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 %      \ABNTEXchapterfont\bfseries\Large\imprimirtitulo
 %    \end{center}
 %    \vspace*{\fill}
-%    
+%
 %    \hspace{.45\textwidth}
 %    \begin{minipage}{.5\textwidth}
 %        \imprimirpreambulo
 %    \end{minipage}%
 %    \vspace*{\fill}
 %   \end{center}
-%        
+%
 %   Trabalho aprovado. \imprimirlocal, 24 de novembro de 2012:
 %
-%   \assinatura{\textbf{\imprimirorientador} \\ Orientador} 
+%   \assinatura{\textbf{\imprimirorientador} \\ Orientador}
 %   \assinatura{\textbf{Professor} \\ Convidado 1}
 %   \assinatura{\textbf{Professor} \\ Convidado 2}
 %   %\assinatura{\textbf{Professor} \\ Convidado 3}
 %   %\assinatura{\textbf{Professor} \\ Convidado 4}
-%      
+%
 %   \begin{center}
 %    \vspace*{0.5cm}
 %    {\large\imprimirlocal}
@@ -313,7 +314,7 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 %    {\large\imprimirdata}
 %    \vspace*{1cm}
 %  \end{center}
-%  
+%
 %\end{folhadeaprovacao}
 % ---
 
@@ -393,8 +394,8 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
    This is the english abstract.
 
    \vspace{\onelineskip}
- 
-   \noindent 
+
+   \noindent
    \textbf{Keywords}: latex. abntex. text editoration.
  \end{otherlanguage*}
 \end{resumo}
@@ -536,23 +537,70 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 %% Imprime uma página indicando o início dos anexos
 %\partanexos
 %
-%% ---
-%\chapter{Morbi ultrices rutrum lorem.}
-%% ---
-%\lipsum[30]
-%
-%% ---
-%\chapter{Cras non urna sed feugiat cum sociis natoque penatibus et magnis dis
-%parturient montes nascetur ridiculus mus}
-%% ---
-%
-%\lipsum[31]
-%
-%% ---
-%\chapter{Fusce facilisis lacinia dui}
-%% ---
-%
-%\lipsum[32]
+%\chapter{Códigos}
+%\begin{coqcode}
+%Lemma aeq_perm_action1_cancel a b c m: b#(m) -> c#(m) -> (c ∙ b)ₜ (a ∙ c)ₜ m ≡α (a ∙ b)ₜ m.
+%Proof.
+%  destruct (a == b), (a == c), (b == c); subst; try (intros HB HC; autorewrite with nominal); auto;
+%    try rewriten (action_switch b c); auto.
+%  gen a b c; induction m as [| | t ? IH | ] using nominal_ind; try intros a b ? HB c ? ? HC; simpls.
+%  - rewrite swap_cancel; fsetdec.
+%  - constructor; [apply IHm1 | apply IHm2]; fsetdec.
+%  - apply notin_remove_1 in HB as []; apply notin_remove_1 in HC as []; subst;
+%      autorewrite with nominal; auto.
+%    + rewriten (swap_neither a c b); auto; apply fresh AeqAbs;
+%        rewriten (action_distr c b a c); rewriten (action_distr a b c b);
+%          rewrite (action_switch c a); apply (IH [(_,_)]); auto; fsetdec.
+%    + apply fresh AeqAbs; rewriten (action_distr c b a c);
+%        rewriten (action_distr a b c b); apply (IH [(_,_)]); auto; fsetdec.
+%    + destruct (a == t), (b == t), (c == t); subst; simpls; autorewrite with nominal; auto; try congruence.
+%      * autorewrite with nominal; apply fresh AeqAbs with z.
+%        rewriten (action_distr b z t b); rewriten (action_distr b z c b);
+%          rewriten (action_distr b z t c); apply (IH [(_,_)]); auto; fsetdec.
+%      * rewriten (swap_neither a c t); auto; apply fresh AeqAbs with z;
+%          rewriten (action_distr c t a c); rewriten (action_distr a t c t);
+%            rewrite (action_switch c a); apply (IH [(_,_)]); auto; fsetdec.
+%      * autorewrite with nominal; apply fresh AeqAbs with z.
+%        rewriten (action_distr t b a t); rewriten (action_distr a b t b);
+%          apply (IH [(_,_)]); auto; fsetdec.
+%      * autorewrite with nominal; apply fresh AeqAbs with z;
+%          rewriten (action_distr t z c b); rewriten (action_distr t z a c);
+%            rewriten (action_distr t z a b); apply (IH [(_,_)]); auto; fsetdec.
+%  - intros d; intros; lets HB1:HB; lets HC1:HC;
+%      apply notin_union_1 in HB1; apply notin_union_1 in HC1;
+%        apply notin_remove_1 in HB1 as []; apply notin_remove_1 in HC1 as []; subst.
+%    + congruence.
+%    + autorewrite with nominal; rewriten (swap_neither d c b); auto;
+%        apply AeqSub with ({{d}} ∪ {{b}} ∪ {{c}} ∪ support m1 ∪ support m2).
+%      * intros z Hz; rewriten (action_distr d z d b); rewriten (action_distr z b d z).
+%        rewriten (action_distr c z c b); rewriten (action_distr z b c z);
+%          rewriten (action_distr z b d c); apply (H [(_,_)]); auto.
+%      * apply (H0 nil); auto.
+%    + autorewrite with nominal; apply AeqSub with ({{d}} ∪ {{b}} ∪ {{c}} ∪ support m1 ∪ support m2).
+%      * intros z ?. rewriten (action_distr c z d b). rewriten (action_distr c b d c).
+%        rewriten (action_distr d b c b). rewriten (action_distr d z c d).
+%        rewriten (action_distr c z d z). rewriten (action_distr c z d b).
+%        rewriten (action_distr d c d b). apply (H [(_,_)]); auto.
+%      * apply (H0 nil); auto.
+%    + apply AeqSub with ({{a}} ∪ {{d}} ∪ {{b}} ∪ {{c}} ∪ support m1 ∪ support m2).
+%      * intros z ?. destruct (c == a), (b == a), (d == a); subst; autorewrite with nominal.
+%        -- auto.
+%        -- congruence.
+%        -- auto.
+%        -- rewriten (action_distr a z d b). rewriten (action_distr d z a b). rewriten (action_distr d z d a).
+%           rewriten (action_distr z a d z). rewrite (action_switch z a).
+%           apply (H [(_,_)]); auto.
+%        -- congruence.
+%        -- rewrite (swap_neither d c a); auto; autorewrite with nominal.
+%           rewriten (action_distr c a d c). rewriten (action_distr d a c a).
+%           rewrite (action_switch c d). apply (H [(_,_)]); auto; fsetdec.
+%        -- rewriten (action_distr b z a b). rewriten (action_distr b z c b).
+%           rewriten (action_distr b z a c). apply (H [(_,_)]); auto; fsetdec.
+%        -- rewriten (action_distr a z d b). rewriten (action_distr a z c b).
+%           rewriten (action_distr a z d c). apply (H [(_,_)]); auto.
+%      * apply (H0 nil); auto.
+%Qed.
+%\end{coqcode}
 %
 %\end{anexosenv}
 
