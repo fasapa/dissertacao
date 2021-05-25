@@ -96,10 +96,7 @@ Notation " '[' a ':=' N ']' M " := (subst_term M N a)
 \end{coqcode}
 No caso da abstração não é necessário verificar a captura de variável livre, pois temos a garantia de que as variáveis ligadas serão sempre diferentes do conjunto \coqinline{L}, portanto passamos como argumento seu construtor \coqinline{Abs}, para propagar a recursão ao corpo da abstração.
 
-Estamos limitados a uma única estrutura, para outras é necessário reimplementar toda teoria!
-
-Entretanto algumas provas crescem bastante, com aplicações não triviais de transitividade, tornando-as longas e complexas. Uma grande vantagem é não precisar de uma representação da $\alpha$-classe de equivalência.
-
+Infelizmente, a simplicidade aparente do método esconde alguns problemas. Algumas demonstrações tornam-se longas e complexas, com aplicações não triviais de transitividade, o que dificulta bastante a automação da técnica. Isto complica a aplicação em formalizações que contem mais de um sistema, acarretando em repetição de código. Apesar das limitações, o grande triunfo do método é poder utilizar a igualdade padrão do Coq, na permutação e maioria das provas, eliminando a necessidade de \setoids, simplificando aplicações de reescrita.
 
 \section{Pritam (Quais titulos?)}\label{sec:choudhury}
 A repetição de código para diferentes estruturas, devido ao método anterior de Copello, traz uma questão interessante sobre formalizar conjuntos nominais antes de aplicar seu método. Com uma biblioteca já fundamentada sobre conjuntos nominais boa parte seria reaproveitada para desenvolvimentos futuros, quem sabe até mecanizada. Porém a formalização de conjuntos nominais em lógicas construtivas apresentam seus próprios desafios. Aqui apresentamos o desenvolvimento de uma formalização de conjuntos nominais bem próxima a apresentada por Pritam. Com a diferença de aproveitarmos algums mecanismos presentes no Coq que possibilitam uma formalização mais simples, próxima ao desenvolvimento da metateoria por meios tradicionais. Pritam descreve dois desafios à esta formalização: a não construtividade do menor suporte finito e trabalhar com \setoids.
