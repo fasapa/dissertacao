@@ -12,10 +12,15 @@ O código acima, define uma família de igualdades para o tipo \coqinline{A}. A 
 \begin{coqcode}
 eq_rect: ∀ (A: Type) (x: A) (P: A -> Type), P x -> ∀ y: A, x = y -> P y.
 \end{coqcode}
-a função \coqinline{eq_rect} permite reescrever termos, em qualquer contexto \coqinline{P}, desde que sejam iguais. Em alguns casos, termos sintaticamente diferentes, ou não convertíveis, podem representar, semanticamente, o mesmo objeto, mediante uma relação de equivalência, o que impossibilita a aplicação das táticas padrões de reescrita. Uma solução seria definir conjuntos quocientes, entretanto isto não é possível sem a adição de axiomas \cite{Chicli2003}, pois tornaria o algoritmo de checagem de tipos indecidível \cite{Geuvers2002}. A alternativa é utilizar reescrita \setoid, por intermédio de funções próprias (\fabricio{próxima seção}).
+a função \coqinline{eq_rect} permite reescrever termos, em qualquer contexto \coqinline{P}, desde que sejam iguais. Em alguns casos, termos sintaticamente diferentes, ou não convertíveis, podem representar semanticamente o mesmo objeto (por exemplo, termos $\alpha$-equivalentes), mediante uma relação de equivalência. Isto implica na impossibilita a aplicação das táticas padrões de reescrita, para termos equivalentes. Uma solução seria definir conjuntos quocientes, entretanto isto não é possível sem a adição de axiomas \cite{Chicli2003}, pois tornaria o algoritmo de checagem de tipos indecidível \cite{Geuvers2002}. A alternativa é utilizar reescrita \setoid. % por intermédio de funções próprias (\fabricio{próxima seção}).
 
-
-\textit{Setoids} \cite{Barthe2003,Bishop2012}, também conhecidos como conjuntos de Bishop, são estruturas formadas por um tipo equipado com uma relação de equivalência.
+\textit{Setoids}, também conhecidos como conjuntos de Bishop \cite{Barthe2003,Bishop2012}, são estruturas formadas por um tipo equipado com uma relação de equivalência. São geralmente utilizados para codificar a ``ideia'' de conjuntos quocientes. Entretanto introduzem mais problemas do que soluções, um cenário conhecido como ``setoid hell''. A implementação de tipos \textit{setoid} não é abstrata, então o usuário, na prática, tem que lidar constantemente com detalhes da implementação (\textit{boilerplate}), como fazer o \textit{lift} do tipo para estrutura \textit{setoid} e gerenciamento manual da aplicação de provas de compatibilidade e lemas customizados de substituição, sem falar quando há mais de um \textit{setoid} envolvido. Isso tudo torna vida do usuário um inferno. Para mitigar algumas dessas deficiências, Coq \cite{Sozeau2009} possui uma implementação de reescrita generalizada (também conhecida como reescrita \textit{setoid}), o que permite substituir termos equivalentes através de uma interface limpa e simplificada, em muitos casos transparente. Para tanto, o usuário precisa informar ao sistema quais contextos (em outras palavras: funções), a reescrita é segura, isto é, demonstrando que a função é respeitosa (\textit{respectful}, veja definição \ref{def:proper}), por meio de instâncias da classe de tipos \coqinline{Proper}.
+\begin{definicao}[Função Respeitosa]\label{def:proper}
+	Sejam $X$ e $Y$ tipos, com suas respectivas relações de equivalências $\approx_X$ e $\approx_Y$. Uma função $F: X \rightarrow Y$ é própria, se esta preserva as relações de equivalência, para todas as entradas:
+	\begin{equation*}
+		\forall a b \in X, a \approx_X b \rightarrow F(a) \approx_Y F(b)
+	\end{equation*}
+\end{definicao}
 
 \section{Classes de tipos}
 
