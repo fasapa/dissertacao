@@ -1,4 +1,29 @@
 \chapter{Metodologia}\label{chp:metodologia}
+
+\section{Coq}
+O assistente de provas Coq \cite{Coq2021} é sistema gerenciador de desenvolvimentos formais, composto por um motor de provas e três linguagens: Gallina (especificação), Vernacular (comandos) e Ltac (metaprogramação). O vernacular são comandos que permitem interagir com o ambiente de provas, como adicionar definições, realizar consultas e alterar configurações. Ltac é utilizado para metaprogramação, sendo principalmente utilizada no desenvolvimento de táticas, consumidas pelo motor de provas, e automação. Por último, Gallina uma linguagem funcional (especificação) com tipos dependentes, na qual implementa o Cálculo de Construções (Co)Indutivas \cite{Coquand1988,Coquand1990,PaulinMohring1993}. Para o desenvolvimento de provas, atendendo ao isomorfismo de Curry-Howard \cite{Soerensen2006}, Coq usufrui do motor de provas para construir termos Gallina (programas), interativamente, por meio da aplicação de táticas. Ao final, o termo construído é enviado ao kernel do Coq para verificação. A seguir, destaco alguns tópicos mais relevantes ao desenvolvimento.
+
+\section{Igualdade e Setoids}
+A igualdade padrão do Coq é sintática, definida pelo tipo indutivo \coqinline{eq} e representado pelo símbolo ``='':
+\begin{coqcode}
+Inductive eq (A: Type) (x: A): A → Prop := eq_refl: x = x.	
+\end{coqcode}
+O código acima, define uma família de igualdades para o tipo \coqinline{A}. A única forma de construir uma prova \coqinline{a = b}, é através do construtor \coqinline{eq_refl}, desde que \coqinline{a} e \coqinline{b} sejam iguais sintaticamente, ou convertíveis. Esta definição é bem útil para reescrita, como pode ser visto no princípio de indução/recursão gerado para \coqinline{eq}:
+\begin{coqcode}
+eq_rect: ∀ (A: Type) (x: A) (P: A -> Type), P x -> ∀ y: A, x = y -> P y.
+\end{coqcode}
+a função \coqinline{eq_rect} permite reescrever termos, em qualquer contexto \coqinline{P}, desde que sejam iguais. Em alguns casos, termos sintaticamente diferentes, ou não convertíveis, podem representar, semanticamente, o mesmo objeto, mediante uma relação de equivalência, o que impossibilita a aplicação das táticas padrões de reescrita. Uma solução seria definir conjuntos quocientes, entretanto isto não é possível sem a adição de axiomas \cite{Chicli2003}, pois tornaria o algoritmo de checagem de tipos indecidível \cite{Geuvers2002}. A alternativa é utilizar reescrita \setoid, por intermédio de funções próprias (\fabricio{próxima seção}).
+
+
+\textit{Setoids} \cite{Barthe2003,Bishop2012}, também conhecidos como conjuntos de Bishop, são estruturas formadas por um tipo equipado com uma relação de equivalência.
+
+\section{Classes de tipos}
+
+Igualdade do coq e setoids
+
+Classes de tipos
+
+
 Teoria de tipos dependentes.
 
 Termos convertíveis são iguais no Coq. Tipo indutivo eq. ``='' é a igualdade padrão no Coq ``$\equiv$'' igualdade \textit{setoid}. Pode-se substituir termos iguais em qualquer expressão pois eles são convertíveis (igualdade de Leibniz).
@@ -9,3 +34,4 @@ apenas somente a subtermos que são argumentos de funções que respeitam a equi
 Falar sobre classes de tipos. É semelhante a implementação em Haskell (falar pq isso é legal tipos de classes), mas no Coq são cidadões de primeira classe graças a teoria de tipos dependentes. Classes são implementadas como records (registros) aliado a tipos implícitos e busca de provas. Registros em Coq são dependentes, ou seja, um membro do registro pode referenciar um membro anterior. Instâncias das classes são instâncias ordinárias dos registros, mas cada instância é registrada em um banco de dados de ``sugestões'' para a busca de provas (semelhante ao Haskell), entretanto Coq permite mais de uma instância de classe (contrário do Haskell), pois pode-se ter mais de uma instância de um registro.
 
 DIFERENÇA ENTRE SET E PROP. FALAR REESCRITA GENERALIZADA E TIPOS DE CLASSES.
+\section{Setoids}
