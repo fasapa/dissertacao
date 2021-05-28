@@ -3,7 +3,7 @@
 \section{Coq}
 O assistente de provas Coq \cite{Coq2021} é sistema gerenciador de desenvolvimentos formais, composto por um motor de provas e três linguagens: Gallina (especificação), Vernacular (comandos) e Ltac (metaprogramação). O vernacular são comandos que permitem interagir com o ambiente de provas, como adicionar definições, realizar consultas e alterar configurações. Ltac é utilizado para metaprogramação, sendo principalmente utilizada no desenvolvimento de táticas, consumidas pelo motor de provas, e automação. Por último, Gallina uma linguagem funcional (especificação) com tipos dependentes, na qual implementa o Cálculo de Construções (Co)Indutivas \cite{Coquand1988,Coquand1990,PaulinMohring1993}. Para o desenvolvimento de provas, atendendo ao isomorfismo de Curry-Howard \cite{Soerensen2006}, Coq usufrui do motor de provas para construir termos Gallina (programas), interativamente, por meio da aplicação de táticas. Ao final, o termo construído é enviado ao kernel do Coq para verificação. A seguir, destaco alguns tópicos mais relevantes ao desenvolvimento.
 
-\section{Igualdade e Setoids}
+\section{Igualdade e \textit{setoids}}
 A igualdade padrão do Coq é sintática, definida pelo tipo indutivo \coqinline{eq} e representado pelo símbolo ``='':
 \begin{coqcode}
 Inductive eq (A: Type) (x: A): A → Prop := eq_refl: x = x.	
@@ -14,7 +14,7 @@ eq_rect: ∀ (A: Type) (x: A) (P: A -> Type), P x -> ∀ y: A, x = y -> P y.
 \end{coqcode}
 a função \coqinline{eq_rect} permite reescrever termos, em qualquer contexto \coqinline{P}, desde que sejam iguais. Em alguns casos, termos sintaticamente diferentes, ou não convertíveis, podem representar semanticamente o mesmo objeto (por exemplo, termos $\alpha$-equivalentes), mediante uma relação de equivalência. Isto implica na impossibilita a aplicação das táticas padrões de reescrita, para termos equivalentes. Uma solução seria definir conjuntos quocientes, entretanto isto não é possível sem a adição de axiomas \cite{Chicli2003}, pois tornaria o algoritmo de checagem de tipos indecidível \cite{Geuvers2002}. A alternativa é utilizar reescrita \setoid. % por intermédio de funções próprias (\fabricio{próxima seção}).
 
-\textit{Setoids}, também conhecidos como conjuntos de Bishop \cite{Barthe2003,Bishop2012}, são estruturas formadas por um tipo equipado com uma relação de equivalência. São geralmente utilizados para codificar a ``ideia'' de conjuntos quocientes. Entretanto introduzem mais problemas do que soluções, um cenário conhecido como ``setoid hell''. A implementação de tipos \textit{setoid} não é abstrata, então o usuário, na prática, tem que lidar constantemente com detalhes da implementação (\textit{boilerplate}), como fazer o \textit{lift} do tipo para estrutura \textit{setoid} e gerenciamento manual da aplicação de provas de compatibilidade e lemas customizados de substituição, sem falar quando há mais de um \textit{setoid} envolvido. Isso tudo torna vida do usuário um inferno. Para mitigar algumas dessas deficiências, Coq \cite{Sozeau2009} possui uma implementação de reescrita generalizada (também conhecida como reescrita \textit{setoid}), o que permite substituir termos equivalentes através de uma interface limpa e simplificada, em muitos casos transparente. Para tanto, o usuário precisa informar ao sistema quais contextos (em outras palavras: funções), a reescrita é segura, isto é, demonstrando que a função é respeitosa (\textit{respectful}, veja definição \ref{def:proper}), por meio de instâncias da classe de tipos \coqinline{Proper}.
+\textit{Setoids}, também conhecidos como conjuntos de Bishop \cite{Barthe2003,Bishop2012}, são estruturas formadas por um tipo equipado com uma relação de equivalência, geralmente utilizados para codificar a ``ideia'' de conjuntos quocientes. Entretanto introduzem mais problemas do que soluções, um cenário conhecido como ``setoid hell''. A implementação de tipos \textit{setoid} não é abstrata, então o usuário, na prática, tem que lidar constantemente com detalhes da implementação (\textit{boilerplate}), como fazer o \textit{lift} do tipo para estrutura \textit{setoid} e gerenciamento manual da aplicação de provas de compatibilidade e lemas customizados de substituição, sem falar quando há mais de um \textit{setoid} envolvido. Para mitigar algumas dessas deficiências, Coq \cite{Sozeau2009} possui uma implementação de reescrita generalizada (também conhecida como reescrita \textit{setoid}), o que permite substituir termos equivalentes através de uma interface limpa e simplificada, em muitos casos transparente. Para tanto, o usuário precisa informar ao sistema quais contextos (em outras palavras: funções), a reescrita é segura, isto é, demonstrando que a função é respeitosa (\textit{respectful}, veja definição \ref{def:proper}), por meio de instâncias da classe de tipos \coqinline{Proper} (\fabricio{VEJA EXEMPLO ABAIXO}).
 \begin{definicao}[Função Respeitosa]\label{def:proper}
 	Sejam $X$ e $Y$ tipos, com suas respectivas relações de equivalências $\approx_X$ e $\approx_Y$. Uma função $F: X \rightarrow Y$ é própria, se esta preserva as relações de equivalência, para todas as entradas:
 	\begin{equation*}
@@ -22,21 +22,77 @@ a função \coqinline{eq_rect} permite reescrever termos, em qualquer contexto \
 	\end{equation*}
 \end{definicao}
 
+Além do problema da reescrita, descrito acima, e a capacidade de representar o conjunto de termos $\alpha$-equivalentes, \textit{setoids} são essências para manter a formalização construtiva. O axioma da extensionalidade funcional é necessário para demonstrar que o conjunto de funções é um conjunto de permutação (\fabricio{REFERENCIAL TEÓRICO}). Apesar do sistema formal do Coq ser consistente com o axioma, perde-se a construtividade, o que pode acarretar em atritos futuros, relacionados a extração de código verificado ou o uso da formalização como biblioteca. \textit{Setoids} permitem recuperar a extensionalidade funcional, mantendo a construtividade, através de uma nova relação de equivalência computacional para funções (\fabricio{VEJA FORMALIZAÇÃO.}).
+
 \section{Classes de tipos}
+Não há muito do que dizer sobre classes de tipos em Coq, pois funcionalmente é bem semelhante a implementação em Haskell \cite{Hall1996}, isto é, um mecanismo de polimorfismo \textit{ad-hoc} \cite{Wadler1989}, com exceção de alguns pontos. Classes de tipos são açúcar sintático (\textit{syntax sugar}) para registros, semelhante a estruturas em C/C++. Entretanto, em Coq, registros são dependentes e paramétricos, ou seja, recebem parâmetros e tipos de membros posteriores podem referenciar membros anteriores. Além do detalhe sintático, classes contam atributos extras: um sistema de busca de provas e inferência (similar a Prolog) e argumentos implícitos. Instâncias de registros são constantes dos mesmos, por consequência, classes de tipos são cidadãos de primeira classe, dessa forma restrições de classe são apenas parâmetros implícitos \cite{Sozeau2008}. Logo, classes de tipos são mais poderosas que sua contrapartida em Haskell, um exemplo é a possibilidade de se definir múltiplas instâncias para o mesmo tipo: em Coq, pode-se definir múltiplas instâncias de monoide para os naturais, um para operações de soma outro para multiplicação. Em Haskell, o mesmo efeito só é possível definindo novos tipos (\haskellinline{Sum} e \haskellinline{Prod}) para cada instância de monoide \cite{HaskellMonoid}.
 
-Igualdade do coq e setoids
+Classes de tipos trazem também uma nova possibilidade, mais simples, de construção de uma hierarquia de estruturas algébricas, assim como em Haskell, dentre diversas implementações de sucesso variado \cite{Geuvers2002,CruzFilipe2004,Garillot2009,Cohen2020}. Spitters e van der Weegen \cite{Spitters2011} propõe justamente isto, definir uma hierarquia algébrica através de classes, com um detalhe: separação entre, no que eles chamam de \textit{unbundling}, classe operacionais e classes predicados. Classes operacionais permitem referenciar operações, como operadores binários em grupos e monoides, concedendo um nome e uma notação canônica. Enquanto classes predicadas agrupam propriedades, no caso de grupos, seus axiomas. 
 
-Classes de tipos
+\section{Classes de tipos e \textit{setoids}}
 
+Com o intuito de exemplificar tudo que foi apresentado, abaixo apresento uma implementação da classe de tipos grupo:\\
+\begin{minipage}[t]{0.5\linewidth}
+\begin{coqcode*}{linenos=true}
+Class Neutral A := neutral: A.
+Class Operator A := op: A → A → A.
+Class Inverse A := inv: A → A.
 
-Teoria de tipos dependentes.
+Class Group (A : Type)
+  `{Ntr: Neutral A, Opr: Operator A, Inv: Inverse A, Equiv A} : Prop := {
+	grp_setoid :> Equivalence (≡@{A});
+	grp_op_proper :> Proper ((≡@{A}) ⇒ (≡@{A}) ⇒ (≡@{A})) (+);
+	grp_inv_proper :> Proper ((≡@{A}) ⇒ (≡@{A})) (-);
+	(* ... *)
+	grp_left_inv : ∀ (x : A), (-x) + x ≡@{A} ɛ@{A};
+}.
+\end{coqcode*}
+\end{minipage}
+\hspace{-1em}
+\begin{minipage}[t]{0.5\linewidth}
+\begin{coqcode}
+Notation ɛ := neutral.
+Infix "+" := op.
+Notation "- x" := (inv x).
+\end{coqcode}
+\end{minipage}\vspace*{.6em}\\
+Linhas 1--3 são classes operacionais. O objetivo é dar um nome canônico, e notação, as operações e elementos de grupos. Temos o elemento neutro (\coqinline{neutral}  \coqinline{ɛ}), a operação binária (\coqinline{op}  \coqinline{+}) e função inversa (\coqinline{inv}  \coqinline{-}). Entre as linhas 5--12 tem-se a implementação da classe predicada \coqinline{Group} (a maior parte é omitida para simplificação da discussão), seu objetivo é agrupar os axiomas de grupo. A classe recebe cinco parâmetros, um explícito tipo \coqinline{A}, seguindo de quatro implícitos generalizados (entre \coqinline{`{}}): três instâncias das classes operacionais e por último uma instância da classe \coqinline{Equiv}. Esta última permite definir grupo para um \textit{setoid} de \coqinline{A}, na qual a relação de equivalência é referenciada pelo nome \coqinline{equiv} e notação \coqinline{≡}. Os parâmetros entre \coqinline{`{}}, como dito, são implicitamente generalizados, isto é, caso dependam de outros parâmetros implícitos, Coq os generaliza e incluem a lista de parâmetros implícitos, simplificando o trabalho do usuário, pois este não precisa memorizar todos os parâmetros necessários a uma classe (\fabricio{VEJA EXEMPLO ABAIXO}). Concluindo a parte sintática, as notações terminadas em \coqinline{@{A}} fornecem explicitamente parâmetros, que diferentemente seriam inferidos implicitamente. As linhas 7--11 são as propriedades da classe, delas apenas a 11 é referente aos axiomas de grupo (as demais foram omitidas). As propriedades entre 7--9 são necessárias a reescrita \textit{setoid}: \coqinline{grp_setoid} é uma prova de equivalência para relação \coqinline{≡@{A}} (classe \coqinline{Equivalence}) e \coqinline{grp_op_proper} e \coqinline{grp_inv_proper} são provas de que a operação binária e inversão são próprias, isto é, contextos nos quais é seguro realizar reescrita generalizada. \coqinline{Proper} espera dois argumentos: uma assinatura e uma função. A assinatura descreve as relações de equivalência para as entradas e saída da função, isto é, \coqinline{Proper ((≡@{A}) ⇒ (≡@{B}) ⇒ (≡@{C})) g} é equivalente a:
+\begin{equation*}
+	\forall (x y : A) (z w : B),~x \equiv_A y \rightarrow z \equiv_B w \rightarrow g(x,z) \equiv_C g(y,w)
+\end{equation*}
+Assim, Coq sabe como reescrever \coqinline{x + y} para \coqinline{z + y}, dado uma prova de \coqinline{x ≡ z}. 
 
-Termos convertíveis são iguais no Coq. Tipo indutivo eq. ``='' é a igualdade padrão no Coq ``$\equiv$'' igualdade \textit{setoid}. Pode-se substituir termos iguais em qualquer expressão pois eles são convertíveis (igualdade de Leibniz).
-Mas ao introduzir uma noção diferente de equivalência, aonde termos não convertíveis são equivalentes, limitamos a reescrita
-apenas somente a subtermos que são argumentos de funções que respeitam a equivalência, chamadas de funções próprias em relação a equivalência. A igualdade é ``forte'' demais, em alguns casos temos objetos que são conceitualmente iguais, mas sintaticamente diferentes. A igualdade no Coq é sintática. Coq não tem tipos quocientes (e não é uma boa ideia implementar PROCURAR REFERÊNCIA checagem de tipos indecidível), utiliza-se \textit{setoids} (conjuntos de Bishop). A substituição de subtermos equivalentes é chamado de reescrita de setoids, e é necessário o gerenciamento correto da aplicação de lemas próprios de funções e equivalências. Sem uma infraestrutura adequada as provas começam a ficar incontroláveis e grandes, aonde surge o setoid hell. Coq possui um mecanismo que da suporte a reescrita setoid baseado em classes de tipos.
+O mecanismo de reescrita generalizada simplifica bastante as provas, eliminando quase completamente as inconveniências envolvendo \textit{setoid}. Abaixo apresento um breve resultado utilizando as técnicas descritas acima, comparando uma propriedade de teoria de grupos e seu equivalente no assistente:
+\vspace*{.4em}\\
+%\hspace*{-1em}
+\begin{minipage}[t]{0.5\linewidth}
+	\begin{corolario}
+		Seja $x \in G$, tal que $G$ é um grupo. A função inversa é involutiva:
+		\begin{align*}
+			& & x& =\\
+			\text{\textup{id. esquerda}}& & \varepsilon + x& =\\
+			\text{\textup{inv. esquerda}}& & (-(-x) + -x) + x& =\\
+			\text{\textup{associatividade}}& & -(-x) + (-x + x)& =\\
+			\text{\textup{inv. esquerda}}& & -(-x) + \varepsilon& =\\
+			\text{\textup{id. direita}}& & -(-x) &
+		\end{align*}
+	\end{corolario}
+\end{minipage}
+\hspace{1em}
+\begin{minipage}[t]{0.5\linewidth}
+	\begin{coqcode}
+Lemma grp_inv_involutive {G: Type}
+  (x: G) `{Group G}: -(-x) ≡@{G} x.
+Proof with auto.
 
-
-Falar sobre classes de tipos. É semelhante a implementação em Haskell (falar pq isso é legal tipos de classes), mas no Coq são cidadões de primeira classe graças a teoria de tipos dependentes. Classes são implementadas como records (registros) aliado a tipos implícitos e busca de provas. Registros em Coq são dependentes, ou seja, um membro do registro pode referenciar um membro anterior. Instâncias das classes são instâncias ordinárias dos registros, mas cada instância é registrada em um banco de dados de ``sugestões'' para a busca de provas (semelhante ao Haskell), entretanto Coq permite mais de uma instância de classe (contrário do Haskell), pois pode-se ter mais de uma instância de um registro.
-
-DIFERENÇA ENTRE SET E PROP. FALAR REESCRITA GENERALIZADA E TIPOS DE CLASSES.
-\section{Setoids}
+		
+rewrite <-(grp_left_id x) at 2;
+rewrite <-grp_left_inv;
+rewrite <-grp_assoc;
+rewrite grp_left_inv;
+rewrite grp_right_id...
+		
+Qed.
+	\end{coqcode}
+\end{minipage}\vspace*{.6em}\\
+À esquerda tem-se a prova informal, enquanto à direita sua prova formal. O lema \coqinline{grp_inv_involutive} tem como parâmetros: um tipo \coqinline{G} (implícito), um termo \coqinline{x} de \coqinline{G} e uma prova implícita de que \coqinline{G} possui uma instância de grupo. Por estar implicitamente generalizada (entre \coqinline{`{}}) Coq inclui, como dito anteriormente, implicitamente todos os parâmetros de \coqinline{Group}. Portanto, temos acesso a um operador binário, uma função inversa, um elemento neutro e uma equivalência para \coqinline{G}, além das propriedades de grupo e reescrita nas nos operadores \coqinline{+} e \coqinline{-}. Como pode ser notado, não há necessidade de lidar diretamente com a implementação de \textit{setoids} e lemas de compatibilidade manualmente. Tornando a formalização quase transparente aos \textit{setoids}.

@@ -106,36 +106,7 @@ Não seria possível desenvolver a teoria, como nos trabalhos de Urban, livre de
 Seguimos um modelo proposto por ... para definição das classes de tipos, sendo elas dividas em duas. As classes operacionais servem como referência as operações e notações utilizadas no segundo tipo de classe, fornecendo um nome canônico, uma forma de referenciar as operações. As classes predicados implementam as restrições da classe de tipo em específico, similarmente em Haskell. Um método denominado \textit{unbundle}.
 
 Afim de mostrar que a permutação definida acima, implementa permutação mostramos que ela forma um grupo de permutação. Primeiro as classes de predicado e respectivas notações:
-\vspace*{.4em}\\
-\begin{minipage}[t]{0.5\linewidth}
-\begin{coqcode}
-Class Neutral A := neutral : A.
-Class Operator A := op: A → A → A.
-Class Inverse A := inv : A → A.
-\end{coqcode}
-\end{minipage}
-\hspace{-1em}
-\begin{minipage}[t]{0.5\linewidth}
-\begin{coqcode}
-Notation ɛ := neutral.
-Infix "+" := op.
-Notation "- x" := (inv x).
-\end{coqcode}
-\end{minipage}
-\vspace*{1em}\\
-E a definição de Grupo (omitindo parte da implementação):
-\begin{coqcode}
-Class Group (A : Type)
-   `{Ntr: Neutral A, Opr: Operator A, Inv: Inverse A, Equiv A} : Prop := {
-  grp_setoid :> Equivalence(≡@{A});
-  grp_op_proper :> Proper ((≡@{A}) ⇒ (≡@{A}) ⇒ (≡@{A})) (+);
-  grp_inv_proper :> Proper ((≡@{A}) ⇒ (≡@{A})) (-);
 
-  grp_assoc : ∀ (x y z : A), x + (y + z) ≡@{A} (x + y) + z;
-  (* ... *)
-}.
-Instance PermGrp: Group perm. Proof. (* ... *) Qed.
-\end{coqcode}
 A definição \coqinline{Group} pode ser lido da seguinte forma: o tipo \coqinline{A} forma um grupo, se dado um elemento neutro, uma operação binária e uma opera unária inverso, ele satisfaz os axiomas padrão de grupo. Além disso queremos garantir que a relação seja uma equivalência, e que a operação binária e unária respeitem a equivalência (\coqinline{grp_op_proper} e \coqinline{grp_inv_proper}). Ao estabelecermos as propriedades Proper, indicamos ao Coq que é seguro fazer a reescrita no contexto das funções, desde que os termos reescritos sejam equivalentes. Dessa forma conseguimos demonstrar propriedades para as classes idênticas as provas tradicionais, simplificando a formalização: \fabricio{TALVES SEJA MAIS INTERESSANTE MOSTRAR UM LEMMA DE AÇÃO DE GRUPO}
 \vspace*{.4em}\\
 %\hspace*{-1em}
