@@ -1,1 +1,64 @@
 \chapter{Referencial Teórico}\label{chp:ref-teorico}
+
+Referencial teórico sobre conjuntos nominais. falar muito breve sobre nomes e simetria/permutação.
+
+Nominal sets capture the notion of name (in)dependence through a simple, and uniform,metatheory based on name permutations. By enriching a structure with (group) action ofpermutations is possible to define such notion of dependence, where the set of names astructure depends on is called support while its complement is formed by the so-calledfresh names. In short, nominal sets gives us the tools to express name dependence for anyelement of it, only by the means of name permutation, i.e.: if any permutation changes aname from the support of an element, then it’ll change such element.  (ainda precisa derevisao geral no paragrafo)
+
+Nomes e permutação de nomes são os pilares da teoria nominal \cite{Pitts2013,Gabbay2002,Pitts2003}. Nomes são uteis por seus identificadores únicos, assim como ponteiros em C/C++ e referencias em Java ou C\#. Sua estrutura interna é abstrata, irrelevante e atômica, isto é, indivisível. Assim, assume-se um conjunto contável\footnote{Não é estritamente necessário que o conjunto de nomes seja contável, veja \cite[Exercício 6.2, página 109]{Pitts2013}. Como neste trabalho nomes são implementados como números naturais, incluo contável como uma propriedade bônus.} infinito de nomes (átomos), com igualdade decidível, denominado $\nameset$, representado por pelas letras minúsculas no início do alfabeto: $a$, $b$, etc. Transposição de nomes (definição \ref{def:swap}), informalmente é uma operação de troca de nomes. Superficialmente, é uma operação sem muito o que adicionar, entretanto como será discutido posteriormente, 
+ela é mais simples, pois, ao contrário da substituição de termos, ela não depende da definição de variável livre, ou ligada, e é imune ao problema da captura de variáveis livres \cite{Pitts2003}.
+\begin{definicao}[Transposição de nomes ou \textit{Swap}]\label{def:swap}
+	Transposições são permutações 2-ciclos, representando por $\langle a~b \rangle : \nameset \rightarrow \nameset$ e definido como:
+	\begin{equation}
+		\langle a~b \rangle ~c \triangleq 
+		\begin{cases}
+			b & \text{\normalfont se } a = c \\
+			a & \text{\normalfont se } b = c \\
+			c & \text{\normalfont caso contrário}
+		\end{cases}
+	\end{equation} 
+\end{definicao}\noindent
+Denoto por $\permset = (\nameset, \circ)$, o grupo de permutação finitas sobre $\nameset$, formado pela composição de transposições, com a função identidade como elemento neutro. Reservo as letras minúsculas $p$, $q$, $r$ e $s$ para designar membros deste grupo. O interessante desta forma de representação, é que permutações podem ser representadas por uma lista de transposições \fabricio{Isso é interessante para implementação pq não tem que lidar com funções, por exemplo: não é sempre possível extrair a função inversa apenas tendo a definição da função. Mas podemos fazer isso com lista, pois basta reverter a lista!}:
+\begin{equation*}
+	\swap{a}{b} \circ \swap{c}{d} \circ \swap{e}{f} \Rightarrow \swap{a}{b}, \swap{c}{d}, \swap{e}{f}
+\end{equation*}
+
+Permutações agem sobre conjuntos quaisquer por meio da ação de permutação, um caso especial da ação de grupo à esquerda:
+\begin{definicao}[Ação de grupo]
+	Seja $G$ um grupo, define-se ação à esquerda de $G$ (com elemento neutro representado por $\neutral$) sobre um conjunto $X$ qualquer, uma função $(\action) : G \times X \rightarrow X$ (\fabricio{é melhor: $(\bullet) : G \rightarrow X \rightarrow X$ ?}), que satisfaz:
+	\begin{align}
+		\forall x \in X,&~~ \neutral \action x = x \label{eq:act-neutral}\\
+		\forall g~h \in G, \forall x \in X,&~~ g \action (h \action x) = (g \circ h) \action x \label{eq:act-compat}
+	\end{align}
+\end{definicao}\noindent
+\begin{definicao}[Ação de permutação e conjunto de permutação]
+	Conjunto de permutação é aquele dotado de uma ação de permutação. Ação de permutação é uma ação definda pelo grupo $\permset$.
+\end{definicao}\noindent
+\fabricio{Exemplos?} Ação de permutação nos fornece um mecanismo simples, capaz de expressar independência/dependência de nomes. Mas primeiramente, vamos discutir o significado informal de (in)dependência, no contexto do \lcalc, pois seu significado depende da estrutura em questão. O conjunto de nomes um termo do \lcalc, módulo $\alpha$-equivalência, depende, chamado de \textbf{suporte}, é justamente o das variáveis livres, pois altera-se seu significado semântico, e sintático, do termo modificando tais nomes. Entretanto, caso não levemos em conta $\alpha$-equivalência, o grupo de nomes dependentes passa a ser todas as variáveis do termo, livres e ligadas, já que não temos mais a equivalência entre termos com ligantes diferentes. O conjunto de nomes independentes, também chamados de nomes frescos, é o complemento do suporte. Agora formalmente, definimos suporte como:
+\begin{definicao}[Suporte]
+	Seja $X$ um conjunto de permutação, então $S \subset \nameset$ suporta $x \in X$ se:
+	\begin{equation}\label{eq:suporte}
+		\forall p \in \permset, ((\forall a \in S, p \action a = a) \rightarrow p \action x = x)
+	\end{equation}
+\end{definicao}\noindent
+Ou seja, se uma permutação $p$, não modifica os nomes do suporte $S$ de $x$, então essa mesma permutação não terá efeito em $x$. Ao contrário, caso a permutação modifique algum elemento de $S$ então ela modificará $x$. A elegância da definição está no fato de fornecer forma genérica, independente de conjunto, de especificar a dependência de nomes, utilizando apenas ação de permutação de nomes. 
+
+Dois pontos extras sobre a definição de suporte: (1) é importante que o suporte seja sempre finito. Se $S = \nameset$, então não é possível obter novos nomes frescos, afinal, foi por isso que estipulamos um conjunto infinito para nomes.
+(2) Podem existir mais de um suporte ($S_1$ e $S_2$) para um elemento de um conjunto nominal. Nestes casos é possível mostrar que $S_1 \cap S_2$ também é um suporte \cite[Proposição 2.3]{Pitts2013}. O que nos leva a definição de menor suporte e frescor, até agora informal:
+\begin{definicao}[Menor suporte]
+	Seja $X$ um conjunto de permutação, o menor suporte é dado pela intersecção de todos os suportes de $x \in X$:
+	\begin{equation}\label{eq:menor-suporte}
+		\text{supp}(x) \triangleq \bigcap \left\{ S \mid S \text{ suporta } x \right\}
+	\end{equation}	
+\end{definicao}
+\begin{definicao}[Frescor]
+	Dado dois conjuntos de permutação $X$ e $Y$, dizemos que $y \in Y$ é fresco em $x \in X$, denotado por $y \# x$, se:
+	\begin{equation}\label{eq:frescor-supp}
+		\text{supp}(y) \cap \text{supp}(y) = \emptyset
+	\end{equation}
+	Como na maioria dos casos $Y = \nameset$, temos que:
+	\begin{equation}\label{eq:frescor}
+		y \# x \leftrightarrow y \notin \text{supp}(x)
+	\end{equation}
+\end{definicao}
+
+\fabricio{Só falta conjuntos nominais e funções equivariantes. Colocar formalização construtiva aqui? Acho que não}

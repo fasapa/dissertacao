@@ -101,9 +101,11 @@ Infelizmente, a simplicidade aparente do método esconde alguns problemas. Algum
 \section{Choudhury}\label{sec:choudhury}
 O método de Copello, apesar de simples e direto, introduz repetição de código e complexidade com a introdução de novas estrutura a formalização. Uma possível solução é seria o desenvolvimento de uma biblioteca de conjuntos nominais, encapsulando e abstraindo conceitos, afim reduzir a reutilização de código e mecanizar a implementação de Copello.
 
-Na busca de desenvolvimentos, e bibliotecas, de conjuntos nominais, em assistentes de provas, pouco foi encontrado, com exceção dos trabalhos produzidor por Urban e seu grupo de métodos nominais\footnote{\textit{Nominal Methods Group} \url{https://nms.kcl.ac.uk/christian.urban/Nominal/}} \cite{Urban2008,Urban2005,Urban2006,Huffman2010,Urban2011}, e a dissertação de mestrado de Choudhury, sob orientação de Pitts \cite{Choudhury2015}. Entretanto qualifico os trabalhos do Urban como formalizações das \textbf{técnicas} nominais, pois estão interessados apenas na aplicação das ideias centrais da teoria nominal em assistentes, assim como Copello. O que diferencia ambos os projetos é a aptidão de mecanização e automação do pacote nominal de Urban. Dessa busca, o único trabalho que realmente propunha formalizar a noção de conjuntos nominais foi Choudhury, com uma representação \textbf{construtiva} no assistente de provas Agda \cite{Bove2009}. É importante frisar o construtivo, pois na teoria nominal é incompatível em lógicas construtivas, isto se deve ao fato de o menor suporte finito ser não construtivo \cite{Swan2016,Swan2017}.
+Na busca de desenvolvimentos, e bibliotecas, de conjuntos nominais, em assistentes de provas, pouco foi encontrado, com exceção dos trabalhos produzidor por Urban e seu grupo de métodos nominais\footnote{\textit{Nominal Methods Group} \url{https://nms.kcl.ac.uk/christian.urban/Nominal/}} \cite{Urban2008,Urban2005,Urban2006,Huffman2010,Urban2011}, e a dissertação de mestrado de Choudhury, sob orientação de Pitts \cite{Choudhury2015}. Entretanto qualifico os trabalhos do Urban como formalizações das \textbf{técnicas} nominais, pois estão interessados apenas na aplicação das ideias centrais da teoria nominal em assistentes, assim como Copello. O que diferencia ambos os projetos é a aptidão de mecanização e automação do pacote nominal de Urban. Dessa busca, o único trabalho que realmente propunha formalizar a noção de conjuntos nominais foi Choudhury, com uma representação \textbf{construtiva} no assistente de provas Agda \cite{Bove2009}. 
 
-Meu desenvolvimento segue, basicamente, o trabalho de Choudhury, com algumas `. A principal é a forma, ou caminho, utilizado para formalizar conjuntos nominais. Choudhury opta por utilizar teoria de categorias, entretanto a falta de uma biblioteca robusta e livre de axiomas de categorias em Coq, impossibilitou seguir por este caminho\footnote{\fabricio{Falar pq? Problemas de inconsistencia de universos causado por categorias grandes?}}. Outros desvios propostos da representação de Choudhury, menos relevantes, serão introduzidos ao longo do capítulo.
+%É importante frisar o construtivo, pois na teoria nominal é incompatível em lógicas construtivas, isto se deve ao fato de o menor suporte finito ser não construtivo \cite{Swan2016,Swan2017}.
+
+Meu desenvolvimento segue, basicamente, o trabalho de Choudhury, com algumas exceções. A principal é a fundamentação utilizada para formalizar conjuntos nominais. Choudhury opta por utilizar teoria de categorias, entretanto a falta de uma biblioteca robusta e livre de axiomas de categorias em Coq, impossibilitou seguir por este caminho\footnote{\fabricio{Falar pq? Problemas de inconsistencia de universos causado por categorias grandes?}}. Outros desvios propostos da representação de Choudhury, menos relevantes, serão introduzidos ao longo do capítulo.
 
 \subsection{Ação de permutação}
 Afim de garantir que a definição de permutações (seção \ref{sec:atomos-permutacao}) realmente implementa permutações, estabeleço uma instância de \coqinline{Group} (seção \ref{sec:classes-setoids}) para \coqinline{perm}, com a concatenação como operador binário, reversão de lista como função reversa e lista vazia como elemento neutro:
@@ -130,36 +132,132 @@ Class Perm (X : Type) `{P : PermAct X, Equiv X} :=
 \end{coqcode*}
 Na linha 2, grupo é um parâmetro explícito generalizado \coqinline{`(Group G)}, ou seja, o parâmetro para uma instância de grupo é explícita, enquanto o resto dos parâmetros de grupo são introduzidos implicitamente. Isto tem um motivo semântico, pois é a de um grupo sobre uma tipo, e prático, em razão de que sempre teremos uma prova de grupo disponível no contexto ao trabalhar com alguma ação. As linhas 3 e 4 são permitem reescritas no contexto da ação, respeitando as equivalências de grupo (\coqinline{≡@{G}}) e do tipo que sofre a ação (\coqinline{≡@{X}}). Enquanto as linhas 5 e 6 são os lemas usuais de ação de grupo a esquerda. Linhas 9--11 especializo ação de grupo para ação de permutação. A classe \coqinline{Perm} é justamente a definição de tipos de permutação definido por Urban em \cite{Urban2008}.
 
-\subsubsection{Permutação sobre funções}
-Ao contrário de Urban, Choudhury não define nenhuma instância de tipos de permutação, portanto sigo a implementação do primeiro aqui para mostrar que existe uma instância de funções para \coqinline{Perm}. Instancias para nomes, listas e tuplas são trivialmente demonstráveis, entretanto para funções provou-se mais desafiador. Sem \textit{setoids} seria impossível definir tal instância sem adição do axioma da extensionalidade funcional, o que acarretaria numa formalização não construtiva. Entretanto o simples uso de \textit{setoids} também não garante o mesmo.
-
-
-
-Assim como feito por Urban, é facilmente demonstrável que, nomes, listas e tuplas (\fabricio{pares?}) são instâncias de \coqinline{Perm}.
-
-\fabricio{FUNÇÕES AÇÃO DE PERMUTAÇÃO}
+%\subsubsection{Permutação sobre funções}
+%Instancias para nomes, listas e tuplas (pares) para \coqinline{Perm} são trivialmente demonstráveis, entretanto, funções prova-se mais desafiador. Choudhury percorre um caminho mais longo, entretanto viável quando um arcabouço de categorias está disponível, tratando funções como pares ordenados (tuplas) e definindo operadores de \textit{curry} e \textit{uncurry}. Aqui, opto pelo caminho direto, semelhante a Urban, definindo \coqinline{Perm (A → B)} ao invés de \coqinline{Perm (A , B)}. Entretanto, diferentemente a Urban, sem o uso \textit{setoids} seria impossível definir tal instância sem adição do axioma da extensionalidade funcional, o que acarretaria numa formalização não construtiva.
+%
+%Infelizmente, utilizar \textit{setoids} não é suficiente para definir \coqinline{Perm (A → B)}. É necessário garantir que a função em sí seja respeitosa. Dados $A$ e $B$ tipos de permutação (\coqinline{Perm A} e \coqinline{Perm B}), queremos mostrar que $A \rightarrow B$ também é um tipo de permutação, ou seja, definir uma instância para \coqinline{Perm (A → B)}. Primeiramente, define-se a seguinte relação de equivalência e ação para funções: 
+%\begin{coqcode}
+%Instance perm_fun_equiv: Equiv (A → B) := 
+%   λ f g, ∀ (a : A), f a ≡@{B} g a.
+%Instance perm_fun_act: PermAct (A → B) :=
+%   λ p (f : A → B), (λ (a : A), p • f(-p • a)).
+%\end{coqcode}
+%Isto é, duas funções são equivalentes, se estas produzem o mesmo resultado para todas as entradas. As propriedades \coqinline{gact_setoid}, \coqinline{gact_id} e \coqinline{gact_compat} de \coqinline{Perm} são trivialmente finalizadas. Entretanto, no caso de
+%\coqinline{gact_proper} alcança-se o seguinte estado de prova:
+%\begin{coqcode}
+%∀ (a: A) (p q: perm) (f g: A → B),
+%   x ≡ y → f ≡ g → p • f (-p • a) ≡@{B} q • g (-q • a)
+%\end{coqcode}
+%Como ação (\coqinline{•}) é respeitosa, obtem-se, aplicando as equivalências \coqinline{x ≡ y} e \coqinline{f ≡ g}:
+%\begin{coqcode}
+%∀ (a: A) (p q: perm) (f g: A → B),
+%   x ≡ y → f ≡ g → p • f (-p • a) ≡@{B} p • f (-q • a)
+%\end{coqcode}
+%Entretanto, não tem-se uma prova de que \coqinline{f} e \coqinline{g} sejam respeitosas, impedindo a reescrita no argumentos de ambas, que levaria ao estado (sabendo que inversa é respeitosa): 
+%\begin{coqcode}
+%∀ (a: A) (p q: perm) (f g: A → B),
+%   x ≡ y → f ≡ g → p • f (-p • a) ≡@{B} p • f (-p • a)
+%\end{coqcode}
+%Finalizável trivialmente por reflexividade.
+%
+%Então, é necessário introduzir uma restrição ao conjunto de funções, àquelas respeitosas. Para isso, sigo uma metodologia similar a (\fabricio{BIBLIOTECA STDPP DO IRIS}), definindo o tipo de funções respeitosas (\coqinline{proper_perm_fun}), isto é, um registro com uma função e uma prova de sua \fabricio{respeitosidade?}, junto com um conjunto de notações, afim de facilitar trabalhar com as mesmas:
+%\begin{coqcode}
+%Record proper_perm_fun: Type := ProperPermFun {
+%   f_car :> A → B;
+%   f_proper: Proper ((≡@{A}) ⇒ (≡@{B})) f_car
+%}.
+%Notation "'λp' x .. y , t" := (* ... *).
+%Notation " A ⭌ B " := (proper_perm_fun A B).
+%\end{coqcode}
+%\fabricio{ENCONTRAR UM SÍMBOLO PARA FUNÇÃO RESPEITOSA} 
+%O símbolo \coqinline{:>} em \coqinline{f_car} introduz uma coerção automática de \coqinline{proper_perm_fun} para função, ao se deparar com uma função respeitosa aonde esperava uma função normal. Com essas modificações é possível demonstrar que o conjunto de funções respeitosas são um tipo de permutação:
+%\begin{coqcode}
+%Instance perm_fun_proper_act : PermAct (A ⭌ B) :=
+%   λ p (f : A ⭌ B), (λp (a : A), p • f(-p • a)).
+%Instance perm_fun_proper_perm: Perm (A ⭌ B).
+%\end{coqcode}
 
 \subsection{Conjuntos nominal}
+Conjuntos nominais são conjuntos de permutação na qual todos os membros são suportados. Por isso, a classe \coqinline{Nominal} definida abaixo, é uma simples extensão de \coqinline{Perm}, indicado pela propriedade \coqinline{nperm}:
 \begin{coqcode}
+Context (X: Type) `{Perm X}.
 Class Support A := support: A → nameset.
-Class Nominal (X: Type) `{Spt : Support X, Perm X}: Prop := {
+Class Nominal `{Support X}: Prop := {
    nperm :> Perm X;
    support_spec: ∀ (x: X) (a b: name),
       a ∉ (support x) → b ∉ (support x) → ⟨a,b⟩ • x ≡@{X} x
 }.
 \end{coqcode}
+Diferentemente de \coqinline{Group} e \coqinline{GAction}, a classe \coqinline{Nominal} é definida utilizando o mecanismo de seção e contexto do Coq. Através do vernacular \coqinline{Context}, Coq introduz ao contexto da definição o tipo \coqinline{X} e uma prova de que é um conjunto de permutação. Isso nos dá acesso a ação e relação de equivalência, definida por \coqinline{Perm X} e utilizada em \coqinline{support_spec}. Ao encerrar a seção, o assistente inclui, como argumentos implícitos à classe \coqinline{Nominal}, todos as propriedades e classes empregues na definição.
+Outra alternativa de especificação seria: \coqinline{Class Nominal (X: Type) `{Support X, Perm X}: Prop := {(* ... *)}}, entretanto estaríamos introduzindo uma redundância de \coqinline{Pemr X} desnecessária, e semanticamente não faria sentindo, apesar de não afetar provas posteriores. É um fenômeno semelhante a herança e composição em linguagens orientadas a objetos. \coqinline{Perm} como argumento designaria ``composição'' de classes, e como membro de classe aponta para herança. Como a semântica correta é no sentido de herança, definimos desta maneira.
 
-Por que Perm é um membro de Nominal? Por que Nominal é um tipo de permutação na qual todo elemento é finitamente suportado.
+\subsubsection{Instâncias de conjuntos nominais e permutação}
+Tendo definido a classe nominal, podemos começar a mostrar algumas instâncias triviais da mesma. Para mostrar que uma instância nominal para um tipo qualquer \coqinline{X}, seguimos os seguintes passos: (1) definir uma relação de equivalência para \coqinline{X}, ou seja, mostrar instâncias \coqinline{eqX: Equiv X} e \coqinline{Equivalence eqX}; (2) estipular uma ação de permutação \coqinline{PermAct X} com uma prova de que respeita as propriedades da mesma \coqinline{Perm X}; (3) definir suporte (\coqinline{Support X}) e finalmente mostrar que todo elemento é suportado (\coqinline{Nominal X}). A seguir apresento algumas instâncias interessantes de conjuntos nominais e conjuntos de permutação.
 
+\begin{description}
+	\item [Bool] é trivialmente nominal, com igualdade sintática como equivalência, ação e suporte vazios (o elemento sintático ``\coqinline{_}'' indica, ao Coq, que o parâmetro não será utilizado.):
+	\begin{coqcode}
+Instance bool_equiv: Equiv bool := λ b1 b2, b1 = b2.
+Instance bool_act: Action bool := λ _ b, b.
+Instance bool_perm: Perm bool. Proof. (* ... *) Qed.
+Instance bool_supp: Support bool := ∅.
+Instance bool_nom: Nominal bool. Proof. (* ... *) Qed.
+	\end{coqcode}
+	
+	\item[Pares (ou tuplas)] são representados pela sintáxe: \coqinline{(a,b)} com \coqinline{a} e \coqinline{b} dois tipos quaisquer. As funções \coqinline{fst} e \coqinline{snd} extraem, respectivamente, o primeiro e segundo elemento do par. Dois pares são equivalentes, quando seus elementos são equivalentes:
+	\begin{coqcode}
+Instance pair_equiv `{Equiv X, Equiv Y}: Equiv (X * Y) :=
+   λ '(x1,y1) '(x2,y2), (x1 ≡@{X} x2) ∧ (y1 ≡@{Y} y2).
+	\end{coqcode}
+	Ação sobre um par é a propagação da mesma para seus membros:
+	\begin{coqcode}
+Instance pair_act `{Action X, Action Y}: Action (X * Y) :=
+   λ (p: perm) '(x,y), (p • x, p • y).
+	\end{coqcode}
+	Tendo definido equivalência e ação, podemos mostrar que par é um conjunto de permutação sabendo que seus membros também são:
+	\begin{coqcode}
+Instance pair_perm `{Perm X, Perm Y}: Perm (X * Y).
+Proof. (* ... *) Qed.
+	\end{coqcode}
+	Suporte é a união dos suportes dos membros:
+	\begin{coqcode}
+Instance pair_supp `{Support X, Support Y}: Support (X * Y) :=
+   λ '(x,y), (support x) ∪ (support y)
+	\end{coqcode}
+	E finalmente, assim como \coqinline{Perm}, mostramos que par é um conjunto nominal, desde que seus membros também sejam:
+	\begin{coqcode}
+Instance pair_nom `{Nominal X, Nominal Y}: Nominal (X * Y).
+Proof. (* ... *) Qed.	
+	\end{coqcode}
 
-   ao definirmos ação de permutação estou interessado em uma implementação de permutação. Em Haskell isso não seria um problema, pois instâncias são únicas para tipos. Como pode-se haver uma ou mais instâncias de \coqinline{}
-
-A repetição de código para diferentes estruturas, devido ao método anterior de Copello, traz uma questão interessante sobre formalizar conjuntos nominais antes de aplicar seu método. Com uma biblioteca já fundamentada sobre conjuntos nominais boa parte seria reaproveitada para desenvolvimentos futuros, quem sabe até mecanizada. Porém a formalização de conjuntos nominais em lógicas construtivas apresentam seus próprios desafios. Aqui apresentamos o desenvolvimento de uma formalização de conjuntos nominais bem próxima a apresentada por Pritam. Com a diferença de aproveitarmos algums mecanismos presentes no Coq que possibilitam uma formalização mais simples, próxima ao desenvolvimento da metateoria por meios tradicionais. Pritam descreve dois desafios à esta formalização: a não construtividade do menor suporte finito e trabalhar com \setoids.
-
-Não seria possível desenvolver a teoria, como nos trabalhos de Urban, livre de axiomas. Uma das noções centrais, funções são tipos de permutação, podem ser demonstrados apenas assumindo a extensionalidade funcional. É importante frisar que extensionalidade não é incompatível com a lógica do Coq, podendo ser incluída como axioma. Entretanto introduzimos um caráter não computacional a formalização, que posteriormente possa impossibilitar extração de código. Ainda, é importante notar que é possível trabalhar com os dois, extensionalidade e extração sem prejudicar, como é feito pela extensão Program do Coq, mas isto está fora do escopo deste trabalho. Portanto optamos por trabalhar com \setoids durante toda a formalização. O que nos diferencia de Pritam é a aplicação de tipos de classes e reescrita generalizada, para alcançar uma formalização mais simples, enxuta, similar as provas de papel e caneta para a metateoria.
-
-Seguimos um modelo proposto por ... para definição das classes de tipos, sendo elas dividas em duas. As classes operacionais servem como referência as operações e notações utilizadas no segundo tipo de classe, fornecendo um nome canônico, uma forma de referenciar as operações. As classes predicados implementam as restrições da classe de tipo em específico, similarmente em Haskell. Um método denominado \textit{unbundle}.
-
-Afim de mostrar que a permutação definida acima, implementa permutação mostramos que ela forma um grupo de permutação. Primeiro as classes de predicado e respectivas notações:
-
-A definição \coqinline{Group} pode ser lido da seguinte forma: o tipo \coqinline{A} forma um grupo, se dado um elemento neutro, uma operação binária e uma opera unária inverso, ele satisfaz os axiomas padrão de grupo. Além disso queremos garantir que a relação seja uma equivalência, e que a operação binária e unária respeitem a equivalência (\coqinline{grp_op_proper} e \coqinline{grp_inv_proper}). Ao estabelecermos as propriedades Proper, indicamos ao Coq que é seguro fazer a reescrita no contexto das funções, desde que os termos reescritos sejam equivalentes. Dessa forma conseguimos demonstrar propriedades para as classes idênticas as provas tradicionais, simplificando a formalização: \fabricio{TALVES SEJA MAIS INTERESSANTE MOSTRAR UM LEMMA DE AÇÃO DE GRUPO}
+	\item[Funções] é mais problemática que os exemplos anteriores. Vamos somente demonstrar que funções formam um conjunto de permutação, se sua imagem e domínio também forem conjuntos de permutação. Isso introduz duas complicações: primeiro, não podemos utilizar igualdade sintática como relação, pois seria necessário assumir a extensionalidade funcional e segundo, temos que garantir tais funções respeitem as equivalência de seus domínios e imagens. A seguinte definição é errônea pois engloba o conjunto de todas as funções, respeitosas ou não:
+	\begin{coqcode}
+Instance perm_fun `{Perm X, Perm Y}: Perm (X → Y).
+	\end{coqcode}
+	Para contornar este problema, precisamos definir o subconjunto de funções respeitosas. Utilizo uma solução proposta na biblioteca Iris, um \textit{framework} de verificação de programas concorrentes através de lógica de separação \cite{Jung2015,Jung2016}. Definimos um registro que contem uma função (\coqinline{f_car}) associado a um certificado de respeitosa (\coqinline{f_proper}):
+	\begin{coqcode}
+Context (A B: Type) `{Perm A, Perm B}.
+Record proper_perm_fun: Type := ProperPermFun {
+   f_car :> A → B;
+   f_proper: Proper ⇝ ((≡@{A}) ⇒ (≡@{B})) f_car
+}.
+Notation "A ⇝ B" := (proper_perm_fun A B).
+Notation "'λp' x .. y , t" := (* ... *)
+	\end{coqcode}
+	O símbolo \coqinline{:>} (em \coqinline{f_car}) e as notações fornecem uma camada de abstração a definição, permitindo manusear \coqinline{proper_perm_fun} como uma função padrão do Coq. A partir daqui, temos tudo que precisamos, então seguimos o roteiro descrito no início da seção. Definimos uma equivalência computacional para a função carregada \coqinline{f_car}:
+	\begin{coqcode}
+Instance perm_fun_proper_equiv `{Equiv B}: Equiv (A ⇝ B) := 
+   λ f g, ∀ (a: A), f a ≡@{B} g a.
+	\end{coqcode}
+	Seguido da ação sobre funções respeitosas:
+	\begin{coqcode}
+Instance perm_fun_proper_act `{PermAct A, PermAct B}: PermAct (A ⇝ B) :=
+   λ r (f : A ⇝ B), (λp (a: A), r • f(-r • a)).
+Proof. (* ... *) Qed.
+	\end{coqcode}
+	Note que estamos definindo ação sobre funções respeitosas, veja o símbolo \coqinline{λp}. Note também a necessidade de chamar o ambiente de provas, por meio do vernacular \coqinline{Proof. (* ... *) Qed}, pois precisamos garantir que esta definição de ação seja respeitosa. Finalizamos com a prova de que o conjunto de funções respeitosas são um conjunto de permutação:
+	\begin{coqcode}
+Instance perm_fun_proper_perm `{Perm A, Perm B}: Perm (A ⇝ B).
+Proof. (* ... *) Qed.
+	\end{coqcode}
+\end{description}
