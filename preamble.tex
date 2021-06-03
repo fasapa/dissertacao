@@ -3,6 +3,7 @@
 \newtheorem{definicao}{Definição}
 \newtheorem{corolario}{Corolário}
 \newtheorem{proposicao}{Proposição}
+\newtheorem{lema}{Lema}
 
 % Formatação de código
 \usepackage{minted}
@@ -20,7 +21,7 @@
 \setlength{\fancyvrbpartopsep}{0pt}
 
 \newminted{coq}{autogobble=true, linenos=false, fontsize=\footnotesize, style=bw}
-\newmintinline{coq}{fontsize=\footnotesize, style=bw}
+\newmintinline{coq}{fontsize=\footnotesize, style=bw, breaklines, breakafter=_}
 \newmintinline{haskell}{fontsize=\footnotesize, style=bw}
 
 % Macros e comandos extras
