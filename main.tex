@@ -101,8 +101,8 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 		pdftitle={\@title},
 		pdfauthor={\@author},
     	pdfsubject={\imprimirpreambulo},
-	    pdfcreator={LaTeX with abnTeX2},
-		pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico},
+	    pdfcreator={LuaLaTeX with abnTeX2},
+		pdfkeywords={conjuntos nominais}{técnicas nominais}{formalização}{Coq},
 		colorlinks=true,       		% false: boxed links; true: colored links
     	linkcolor=blue,          	% color of internal links
     	citecolor=blue,        		% color of links to bibliography
@@ -377,16 +377,9 @@ as normas ABNT apresentado à comunidade de usuários \LaTeX.}
 % resumo em português
 \setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
 \begin{resumo}
- Segundo a \citeonline[3.1-3.2]{NBR6028:2003}, o resumo deve ressaltar o
- objetivo, o método, os resultados e as conclusões do documento. A ordem e a extensão
- destes itens dependem do tipo de resumo (informativo ou indicativo) e do
- tratamento que cada item recebe no documento original. O resumo deve ser
- precedido da referência do documento, com exceção do resumo inserido no
- próprio documento. (\ldots) As palavras-chave devem figurar logo abaixo do
- resumo, antecedidas da expressão Palavras-chave:, separadas entre si por
- ponto e finalizadas também por ponto.
+	Apresentamos uma formalização em progresso de conjuntos nominais em Coq, salientando as principais decisões de design e projeto. Implementamos e comparamos dois métodos, um pragmático, apoiada nos pilares básicos da teoria nominal, e uma formalização, propriamente dita, construtiva de conjuntos nominais. Mostramos que graças a classe de tipos e reescrita generalizada alcançamos definições e provas concisas, ao mesmo tempo evitando o conhecido cenário ``\textit{setoid hell}''.
 
- \textbf{Palavras-chave}: latex. abntex. editoração de texto.
+ \textbf{Palavras-chave}: conjuntos nominais, técnicas nominais, formalização, Coq.
 \end{resumo}
 
 % resumo em inglês

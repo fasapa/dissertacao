@@ -18,27 +18,50 @@ As permutações são funções bijetoras, de um conjunto para si mesmo, na qual
 \end{definicao}\noindent
 Fazendo $X = \nameset$, obtemos a operação de transposição de nomes, essencialmente uma função que troca nomes. O interesse em utilizar transposição como operação básica de alteração sintática, em gramáticas com estruturas ligantes, ao contrário da substituição de termos, está no fato de não dependerem da definição de variável livre ou ligada e serem imunes a captura de variáveis livres \cite{Pitts2003}. 
 
-Denotamos por $\permset = (\nameset, \circ)$, o grupo de permutação finitas sobre $\nameset$, formado pela composição de transposições, com a função identidade como elemento neutro. Reservo as letras minúsculas $p$, $q$, $r$ e $s$ para designar membros deste grupo. Permutações agem sobre conjuntos por meio da operação de ação (à esquerda) de grupo:
-\begin{definicao}[Ação de grupo]
-	Seja $G$ um grupo, define-se ação à esquerda de $G$ (com elemento neutro representado por $\neutral$) sobre um conjunto $X$ qualquer, uma função $(\action) : G \times X \rightarrow X$ (\fabricio{é melhor: $(\bullet) : G \rightarrow X \rightarrow X$ ?}), que satisfaz:
+Denotamos por $\permset = (\nameset, \circ)$ o grupo de permutações finitas sobre $\nameset$, formado pela composição de transposições, com a função identidade como elemento neutro. Reservamos as letras minúsculas $p$, $q$, $r$ e $s$ para designar membros deste grupo. Permutações agem sobre conjuntos por meio da operação de ação (à esquerda) de grupo:
+\begin{definicao}[Ação de grupo \cite{Pitts2013}]
+	Seja $(G, \circ)$ um grupo com elemento neutro representado por $\neutral$.  Define-se ação à esquerda de $G$ sobre um conjunto $X$ qualquer como uma função $(\action) : G \times X \rightarrow X$,
+	%(\fabricio{é melhor: $(\bullet) : G \rightarrow X \rightarrow X$ ?}),
+	que satisfaz:
 	\begin{align}
 		\forall x \in X,&~~ \neutral \action x = x \label{eq:act-neutral}\\
 		\forall g~h \in G, \forall x \in X,&~~ g \action (h \action x) = (g \circ h) \action x \label{eq:act-compat}
 	\end{align}
 \end{definicao}\noindent
-\begin{definicao}[Ação de permutação e conjunto de permutação]\label{def:acao-permutacao}
-	Conjunto de permutação é aquele dotado de uma ação de permutação. Ação de permutação é uma ação definda pelo grupo $\permset$.
+\begin{definicao}[Ação de permutação e conjunto de permutação \cite{Pitts2013}]\label{def:acao-permutacao}
+	Ação de permutação é uma ação definida pelo grupo $\permset$. Conjunto de permutação é aquele dotado de uma ação de permutação.
 \end{definicao}\noindent
 
-Ao enriquecer um conjunto com uma ação de permutação (definição \ref{def:acao-permutacao}) conseguimos estabelecer a noção de dependência de nomes, apresentada anteriormente, na qual o conjunto de nomes ao qual uma estrutura depende é chamado de \textbf{suporte}, enquanto seu complemento é denominado de nomes frescos.
-Mas primeiramente, vamos discutir o significado informal de (in)dependência, no contexto do \lcalc, pois seu significado depende da gramática e semântica em questão. Um termo, por exemplo $\lambda x. (xy)$, depende de todas as variáveis contidas nele, pois a modificação de qualquer nome implica num novo termo, sintaticamente diferente, como $\lambda x. (xz)$ ou $\lambda z. (zy)$. Entretanto, se considerarmos termos módulo $\alpha$-equivalência ($\aeq$), o conjunto de nomes dependentes são apenas as variáveis livres, pois continuando com nosso exemplo: $\lambda x. (xy) \not\aeq \lambda x. (xz)$, mas $\lambda x. (xy) \aeq \lambda z. (zy)$. Formalmente definimos suporte como:
+Ao enriquecer um conjunto com uma ação de permutação (definição \ref{def:acao-permutacao}) conseguimos estabelecer uma noção de dependência de nomes, aonde o conjunto de nomes ao qual uma estrutura depende é chamado de \textbf{suporte}, enquanto seu complemento é denominado de nomes frescos.
+Mas primeiramente, vamos discutir o significado informal de (in)dependência, no contexto do \lcalc, pois seu significado depende da gramática e semântica em questão.
+
+O conjunto dos termos ($\Lambda$) do \lcalc~é dado pela gramática \cite{Hindley2008}, utilizando nomes no lugar de variáveis:
+\begin{equation*}
+	M, N \in \Lambda ::= a \in \nameset \mid (M N) \mid (\lambda a . M)
+\end{equation*}
+aonde estamos utilizando nomes no lugar de variáveis, $(M N)$ representa a aplicação de dois termos e $(\lambda a . M)$ denota uma abstração. O conjunto de variáveis livres é definido como:
+\begin{definicao}[Variáveis livres e ligadas \cite{Hindley2008}]
+	O conjunto de variáveis livres é definido recursivamente na estrutura de um termo pela função $\text{FV}: \Lambda \rightarrow \nameset$, para $a \in \nameset$ e $M, N \in \Lambda$:
+	\begin{equation*}
+		\text{FV}(a) = \{a\}, ~ \text{FV}(MN) = \text{FV}(M) \cup \text{FV}(N), ~
+		\text{FV}(\lambda a . M) = \text{FV}(M) - \{a\}
+	\end{equation*}
+	O conjunto de variáveis ligadas é definido recursivamente na estrutura de um termo pela função $\text{BV}: \Lambda \rightarrow \nameset$, da seguinte maneira:
+	\begin{equation*}
+		\text{BV}(a) = \{\emptyset\}, ~ \text{BV}(MN) = \text{BV}(M) \cup \text{BV}(N), ~
+		\text{BV}(\lambda a . M) = \text{BV}(M) \cup \{a\}
+	\end{equation*}
+\end{definicao}\noindent
+Dizemos que termos são $\alpha$-equivalentes, denotado $M \aeq N$, se estes diferem apenas nas variáveis ligadas.
+
+Um termo, por exemplo $W = \lambda x. (xy)$, depende de todas as variáveis ($\text{BV}(W) \cup \text{FV}(W)$) contidas nele, pois a modificação de qualquer nome implica num novo termo, sintaticamente diferente, como $\lambda x. (xz)$ ou $\lambda z. (zy)$. Entretanto, se considerarmos termos módulo $\alpha$-equivalência, o conjunto de nomes dependentes são apenas as variáveis livres ($\text{FV}(W)$), pois continuando com nosso exemplo: $\lambda x. (xy) \not\aeq \lambda x. (xz)$, mas $\lambda x. (xy) \aeq \lambda z. (zy)$. Formalmente definimos suporte como:
 \begin{definicao}[Suporte]
 	Seja $X$ um conjunto de permutação, então $S \subset \nameset$ suporta $x \in X$ se:
 	\begin{equation}\label{eq:suporte}
 		\forall p \in \permset, ((\forall a \in S, p \action a = a) \rightarrow p \action x = x)
 	\end{equation}
 \end{definicao}\noindent
-Ou seja, se uma permutação $p$, não modifica os nomes do suporte $S$ de $x$, então essa mesma permutação não terá efeito em $x$. Ao contrário, caso a permutação modifique algum elemento de $S$ então ela modificará $x$. A elegância da definição está no fato de fornecer uma forma simples de especificar dependência de nomes, apenas através da noção de permutação de nomes, 
+Ou seja, se uma permutação $p$ não modifica os nomes do suporte $S$ de $x$, então essa mesma permutação não terá efeito em $x$. Ao contrário, caso a permutação não modifique algum elemento de $S$ então ela não modificará $x$. A elegância da definição está no fato de fornecer uma forma simples de especificar dependência de nomes, apenas através da noção de permutação de nomes.
 
 Gostaríamos de ressaltar dois pontos extras sobre a definição de suporte: (1) é importante que seja sempre finito. Caso $S = \nameset$, em suporte, então não é possível obter novos nomes frescos, pois esgotaram-se as opções.
 (2) Podem existir mais de um suporte ($S_1$ e $S_2$) para um único elemento. Nestes casos é possível mostrar que $S_1 \cap S_2$ também é um suporte \cite[Proposição 2.3]{Pitts2013}. O que nos leva a definição de menor suporte:
