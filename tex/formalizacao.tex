@@ -70,8 +70,7 @@ Instance perm_equiv: Equiv perm :=
    λ (p q: perm), ∀ (a: name), swap_perm p a = swap_perm q a.
 Instance perm_equivalence: Equivalence perm_equiv. Proof. (* ... *) Qed.
 \end{coqcode}
-Em que, \coqinline{swap_perm} aplica todas as transposições de uma lista em um nome. Outra vantagem desta representação, é podermos definir facilmente a permutação inversa, revertendo a lista. Caso tivéssemos representado permutações como funções bijetoras, não seriamos capazes de obter a função inversa para qualquer permutação. Mesmo com a prova da existência de tal inversa, sua extração só seria possível com adição do axioma da escolha, o que também tornaria o desenvolvimento não construtivo \fabricio{LI ISSO DO ARTHUR AMORIN NO STACKOVERFLOW, NÃO TENHO REFERENCIA, OQ FAZER?}.
-
+Em que, \coqinline{swap_perm} aplica todas as transposições de uma lista em um nome. Outra vantagem desta representação, é podermos definir facilmente a permutação inversa, revertendo a lista. Caso tivéssemos representado permutações como funções bijetoras, não seriamos capazes de obter a função inversa para qualquer permutação. Mesmo com a prova da existência de tal inversa, sua extração só seria possível com adição do axioma da escolha única, que não é válido no cálculo de construções \cite{Maietti2017}.
 %Como discutido anteriormente (\fabricio{QUAL SEÇÃO?}), a representação de permutações não é única. Para isto defino uma relação de equivalência \coqinline{perm_equiv}, que iguala duas permutações se estas produzem o mesmo resultado sobre todos os nomes, com uma prova (\coqinline{perm_equivalence}) de que realmente é uma equivalência (reflexividade, simetria e transitividade).
 
 \section{Copello \textit{et. al.}}\label{sec:copello}
