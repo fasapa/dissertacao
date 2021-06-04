@@ -1,28 +1,32 @@
-\chapter{Formalização}\label{chp:formalizacao}
+\chapter{Formalizações de conjuntos nominais}\label{chp:formalizacao}
 
-Neste capítulo apresento, primeiramente, a implementação de átomos e permutações, pois ambas as formalizações seguintes compartilham da mesma implementação, seção \ref{sec:atomos-permutacao}, junto com duas formalizações, no assistente de provas Coq, baseadas nos trabalhos de Copello \textit{et. al.} \cite{Copello2016}, seção \ref{sec:copello}, e Choudhury \cite{Choudhury2015}, seção \ref{sec:choudhury}, ambos em Agda. A primeira formalização está relacionado a uma classe de implementações pragmáticas, também denominadas de ``técnicas nominais'' \cite{Copello2016,Copello2018,Ambal2020,Tasistro2015,Aydemir2007}, enquanto a segunda, pertence ao grupo de formalizações de conjuntos nominais, ou sintaxe abstrata nominal \cite{AyalaRincon2019,Choudhury2015}.
+Neste capítulo apresentamos duas metodologias distintas de implementação da teoria nominal, desenvolvidas no assistente de provas Coq. A primeira metodologia, proposta por Copello \textit{et. al.} \cite{Copello2016}, seção~\ref{sec:copello}, está relacionado a uma classe de implementações pragmáticas, também denominadas de ``técnicas nominais'' \cite{Aydemir2007,Copello2016,Tasistro2015,Copello2018,Ambal2020}. A segunda, desenvolvida por Choudhury, em sua dissertação de mestrado \cite{Choudhury2015}, seção~\ref{sec:choudhury}, apresenta uma formalização de conjuntos nominais propriamente dito. 
 
-Inicialmente, optei pela técnica nominal adotada por Copello \textit{et. al.}, aonde as principais características são: considerar a permutação de nomes como uma operação básica, por exemplo ao definir substituição de termos ou $\alpha$-equivalência, pois esta apresenta um melhor comportamento, devido a impossibilidade da captura de variável livre, simplificando a verificação. Outro ponto importante, no trabalho de Copello, é a derivação de um princípio de indução/recursão $\alpha$-estrutural, simulando efetivamente a BVC.
-Todavia, como verificado em minhas investigações e outros trabalhos \cite{Aydemir2008}, a falta de uma formalização da teoria nominal, ou uma biblioteca mecanizada/automatizada de infraestrutura, acarreta desenvolvimentos desagradáveis, focado em sistemas isolados, pois a adição de outros para análise, por exemplo no estudo de codificações, implicaria na repetição de código. Portanto, alterei o foco do projeto para a investigação da formalização de conjuntos nominais em Coq, apoiado no trabalho de Choudhury, como uma biblioteca de suporte, para projetos futuros.
+A técnica nominal de Copello \textit{et. al.}, tem como principais características: considerar a permutação de nomes como uma operação básica, por exemplo ao definir substituição de termos ou $\alpha$-equivalência, pois esta apresenta um melhor comportamento, devido a impossibilidade da captura de variável livre, simplificando a verificação. Outro ponto importante, em \cite{Copello2016}, é a derivação de um princípio de indução/recursão $\alpha$-estrutural, simulando efetivamente a condição da variável de Barendregt \cite[BVC]{Barendregt2012}.
+A aplicação da teoria nominal em trabalhos verificação formal se torna é inviável sem uma infraestrutura automatizada \cite{Aydemir2008}. Isto se deve a sua complexidade de implementação, em relação a outros métodos como índices de deBruijn (\fabricio{REFERENCIA}) e Locally Nameless (\fabricio{REFERENCIA}).
+Portanto, alteramos o foco do projeto para a investigação da formalização de conjuntos nominais em Coq, baseado na abordagem de Choudhury \cite{Choudhury2015}, como uma biblioteca de suporte para projetos futuros.
 
-\fabricio{A formalização se encontra no repositório bla bla bla}
+Antes de tudo, começamos o capítulo com a discussão de nomes e permutações, visto que a implementação dos mesmos é idêntica em ambas as metodologias.
+%Neste capítulo apresento, primeiramente, a implementação de átomos e permutações, pois ambas as formalizações seguintes compartilham da mesma implementação, seção \ref{sec:atomos-permutacao}, junto com duas formalizações, no assistente de provas Coq, baseadas nos trabalhos de , seção \ref{sec:copello}, e Choudhury \cite{Choudhury2015}, seção \ref{sec:choudhury}, ambos em Agda.  enquanto a segunda, pertence ao grupo de formalizações de conjuntos nominais, ou sintaxe abstrata nominal \cite{AyalaRincon2019,Choudhury2015}.
+
+\fabricio{LINK PARA FORMALIZAÇÃO NO GITHUB DE AMBAS!}
 
 % O conjunto dos pragmatistas veem operações baseadas em permutação de nomes como uma ``boa ideia''. Isto, se deve ao fato da permutação de nomes se comportar melhor do que a substituição, pois nesta pode ocorrer captura de variável livre, enquanto a permutação é livre deste problema. Entretanto, tais trabalhos, geralmente, ficam restritos a uma um único sistema, devido a falta de mecanização e automação. Urban \cite{Urban2008}
 
 %Urban está no meio das duas escolas (compromisso).
 
 \section{Átomos e Permutação}\label{sec:atomos-permutacao}
-Definimos nomes como estruturas atômicas, ou seja, indivisíveis. A estrutura interna dos átomos é irrelevante, pois estamos interessados apenas em seus identificadores, assim como ponteiros em algumas linguagens de programação. No entanto, certas condições precisam ser satisfeitas: conjunto de nomes deve ser infinito, contável e com igualdade decidível. Dessa forma, é possível obter um nome novo (\textbf{fresco}) e decidir quando dois nomes são diferentes ou iguais, sob quaisquer circunstâncias.
+Definimos nomes como estruturas atômicas, ou seja, indivisíveis. A estrutura interna dos átomos é irrelevante, pois estamos interessados apenas em seus identificadores, assim como ponteiros em algumas linguagens de programação. No entanto, certas condições precisam ser satisfeitas: conjunto de nomes deve ser contável infinito (\fabricio{VERIFICAR SE ESTÁ NO REFERENCIAL TEÓRICO CONTÁVEL, POSSIVELMENTE JÁ ESTÁ!}) e com igualdade decidível. Dessa forma, é possível obter um nome novo, também chamado de fresco, e decidir quando dois nomes são diferentes ou iguais, sob quaisquer circunstâncias.
 
-Módulos e assinaturas do Coq, permitem definir estruturas de dados abstratas, ideal para implementação de átomos. Enquanto módulos são semelhantes a outras implementações em linguagens de programação convencionais, no sentindo de agrupar definições sobre um único nome, assinaturas tem origem na linguagem OCaML, na qual permitem: ocultar, limitar o acesso e visibilidade do conteúdo externo ao módulo. Abaixo segue a implementação de átomos através desta técnica:
+Abaixo segue a implementação de átomos utilizando módulos:
 \vspace*{.4em}\\
 \begin{minipage}[t]{0.5\linewidth}
 \begin{coqcode}
 Module Type ATOMIC.
-  Parameter t : Set.
-  Axiom cnt : Countable t.
-  Axiom dec : EqDecision t.
-  Axiom inf : Infinite t.
+  Parameter t: Set.
+  Axiom cnt: Countable t.
+  Axiom dec: EqDecision t.
+  Axiom inf: Infinite t.
 End ATOMIC.
 Notation name := Atom.t
 \end{coqcode}
@@ -32,15 +36,14 @@ Notation name := Atom.t
 \begin{coqcode}
 Module Atom : ATOMIC.
   Definition t := nat.
-  Instance cnt : Countable t := nat_countable.
-  Instance dec : EqDecision t := nat_eq_dec.
-  Instance inf : Infinite t := nat_infinite.
+  Instance cnt: Countable t := nat_countable.
+  Instance dec: EqDecision t := nat_eq_dec.
+  Instance inf: Infinite t := nat_infinite.
 End Atom.
 \end{coqcode}
 \end{minipage}
 \vspace*{1em}\\
-O módulo \coqinline{Atom} agrupa a definição de átomo \coqinline{t}, juntamente com suas propriedades, via classes de tipos: \coqinline{cnt}, \coqinline{dec} e \coqinline{inf}, respectivamente provas da contabilidade, decidibilidade e infinitude. Átomos são implementados como naturais, pois estes possuem as mesmas propriedades esperadas para átomos. Afim de ocultar a implementação, aplica-se a assinatura \coqinline{ATOMIC} ao módulo \coqinline{Atom}, definindo-o como um conjunto qualquer, pertencente ao universo \coqinline{Set}. Ao longo da formalização utilizo a palavra-chave \coqinline{name} como apelido para \coqinline{Atom.t}.
-\fabricio{Dizer oq Countable, EqDecision e Infinite fazem exatamente?}
+O módulo \coqinline{Atom} agrupa a definição de átomo \coqinline{t}, juntamente com suas propriedades, via classes de tipos: \coqinline{cnt}, \coqinline{dec} e \coqinline{inf}, respectivamente provas da contabilidade, decidibilidade e infinitude. Átomos são implementados como naturais, pois estes possuem as mesmas propriedades esperadas para átomos. Afim de ocultar a implementação, aplica-se a assinatura \coqinline{ATOMIC} ao módulo \coqinline{Atom}, definindo-o como um conjunto qualquer, pertencente ao universo \coqinline{Set}. Ao longo da formalização utilizo a palavra-chave \coqinline{name} como apelido para \coqinline{Atom.t}. 
 
 %Implementamos átomos como naturais.
 %Assinaturas (tipo de módulos) têm duas utilidades: garantir que um módulo implementa corretamente alguma regra e esconder informação. Somente declarações presentes na assinatura podem ser acessadas externa ao módulo. Como não estamos omitindo nenhuma definição, estamos escondendo a implementação de átomo. portanto Atom.t é abstrato.
@@ -48,30 +51,40 @@ O módulo \coqinline{Atom} agrupa a definição de átomo \coqinline{t}, juntame
 %Construímos um novo tipo abstrato \coqinline{Atom.t} com igualdade decidível \coqinline{Atom.dec} e infinito \coqinline{Atom.inf} no qual chamamos de \coqinline{name}. \coqinline{nameset} conjunto finito de nomes representado por uma lista. \fabricio{Explicar as type classes EqDecision e Infinite, que propriedades elas agregram ao desenvolvimento. Por exemplo EqDecision dá acesso a \texttt{decide} a partir de uma proposição, enquanto Infinite da acesso a \texttt{fresh} para gerar uma átomo novo}.
 %Countable dá acesso a função choice: dado uma prova $\exists x, P x$ obtemos um programa $\{x | P x\}$ tipo $\Sigma$. Eqdecision dá acesso a decide: relaciona uma relação a um procedimento decidível para esta relação. Infinite da acesso a fresh: dado um conjunto obtemos um novo que não pertence a este conjunto.
 
-A representação de permutações, e função de transposição, não tem segredos, sendo bastante similar a definida no capítulo \fabricio{REFERENCIAL TEORICO}:
+A definição da função de transposição (definição~\ref{def:swap}) é direta, recebe um par de nomes \coqinline{'(a,b)}, um nome \coqinline{c} e retorna um nome:
+\begin{coqcode}
+Definition swap '(a,b) c: name :=
+   if decide (a = c) then b else (if decide (b = c) then a else c).
+\end{coqcode}
+O operador \coqinline{decide} é proveniente da classe \coqinline{EqDecision}, ele recebe uma relação e retorna o procedimento de decisão para esta relação. 
+Dado que permutações podem ser decompostas em transposições, a representamos como uma lista de pares de nomes:
 \begin{coqcode}
 Notation perm := (list (name * name)).
 Notation "⟨ a , b ⟩" := (@cons (name * name) (a,b) (@nil _)).
-Definition swap '(a,b) : name → name :=
-  λ c, if decide (a = c) then b else if decide (b = c) then a else c.
-Definition swap_perm (p: perm): name → name :=
-  λ a, foldl (λ x y, swap y x) a p.
+Notation "⟨ ⟩" := (@nil (name * name)).
+\end{coqcode}
+Como essa representação não é única, por exemplo \coqinline{⟨a,a⟩} e \coqinline{⟨⟩}, introduzimos uma relação (\coqinline{perm_equiv}) de equivalência (\coqinline{perm_equivalence}) para permutações, introduzindo nosso primeiro \textit{setoid}:
+\begin{coqcode}
+Definition swap_perm (p: perm) (a: name): name :=
+   foldl (λ x y, swap y x) a p.
 Instance perm_equiv: Equiv perm :=
-  λ p q, ∀ a, swap_perm p a = swap_perm q a.
+   λ (p q: perm), ∀ (a: name), swap_perm p a = swap_perm q a.
 Instance perm_equivalence: Equivalence perm_equiv. Proof. (* ... *) Qed.
 \end{coqcode}
-Além da representação autoexplicativa \coqinline{perm}, a notação \coqinline{⟨a,b⟩} é útil ao referenciar permutações com um único par de nomes.
+Em que, \coqinline{swap_perm} aplica todas as transposições de uma lista em um nome. Outra vantagem desta representação, é podermos definir facilmente a permutação inversa, revertendo a lista. Caso tivéssemos representado permutações como funções bijetoras, não seriamos capazes de obter a função inversa para qualquer permutação. Mesmo com a prova da existência de tal inversa, sua extração só seria possível com adição do axioma da escolha, o que também tornaria o desenvolvimento não construtivo \fabricio{LI ISSO DO ARTHUR AMORIN NO STACKOVERFLOW, NÃO TENHO REFERENCIA, OQ FAZER?}.
 
-Como discutido anteriormente (\fabricio{QUAL SEÇÃO?}), a representação de permutações não é única. Para isto defino uma relação de equivalência \coqinline{perm_equiv}, que iguala duas permutações se estas produzem o mesmo resultado sobre todos os nomes, com uma prova (\coqinline{perm_equivalence}) de que realmente é uma equivalência (reflexividade, simetria e transitividade).
+%Como discutido anteriormente (\fabricio{QUAL SEÇÃO?}), a representação de permutações não é única. Para isto defino uma relação de equivalência \coqinline{perm_equiv}, que iguala duas permutações se estas produzem o mesmo resultado sobre todos os nomes, com uma prova (\coqinline{perm_equivalence}) de que realmente é uma equivalência (reflexividade, simetria e transitividade).
+
 \section{Copello \textit{et. al.}}\label{sec:copello}
-O ponto central dos trabalhos de Copello \textit{et. al.} \cite{Copello2016,Copello2018} é a derivação de um princípio de indução/recursão $\alpha$-estrutural para o \lcalc~em uma teoria de tipos construtiva (Agda), sem a necessidade de uma representação para classe de $\alpha$-equivalência. Os únicos requisitos são: a existência da ação de permutação, sobre os termos do cálculo, e $\alpha$-equivalência definido via permutação de nomes.  Copello \textit{et. al.} observa que propriedades/funções, sobre a classe de $\alpha$-equivalência são invariantes para membros da mesma, denominado $\alpha$-compatibilidade (definição \ref{def:alpha-compatibilidade}). Dessa forma, ao aplicar uma propriedade, ou função, da classe, pode-se escolher um membro apropriado (via permutação de nomes), ou seja fresco, efetivamente simulando a BVC.
+O ponto central dos trabalhos de Copello \textit{et. al.} \cite{Copello2016,Copello2018} é a derivação de um princípio de indução/recursão $\alpha$-estrutural para o \lcalc~em uma teoria de tipos construtiva (Agda). Os únicos requisitos, para isso, são: a existência da ação de permutação, sobre os termos do cálculo, e $\alpha$-equivalência definido via permutação de nomes. E diferentemente do pacote nominal do Isabelle/HOL, que define uma estrutura de dados para representar a classe de $\alpha$-equivalência, Copello \textit{et. al.} trabalha com termos-$\lambda$ puros, o que ele chama de \textit{raw terms}. Para tanto, introduzem o conceito de $\alpha$-compatibilidade:
 \begin{definicao}[$\alpha$-Compatibilidade]\label{def:alpha-compatibilidade}
 Um predicado $P$, sobre os termos do \lcalc~é dito $\alpha$-compatível se, dados $M$ e $N$ $\alpha$-equivalentes, implica $\pred{P}{M} \leftrightarrow \pred{P}{N}$.
 Uma função $F$, sobre os termos do \lcalc~é dito fortemente $\alpha$-compatível se, dados $M$ e $N$ $\alpha$-equivalentes, implica $F(M) = F(N)$.
-\end{definicao}
+\end{definicao}\noindent
+Dessa forma, ao aplicar uma propriedade ou função da classe, escolhe-se um representante apropriado da $\alpha$-classe de equivalência, na qual todos os nomes ligados são diferentes dos nomes livres, via permutação de nomes, efetivamente simulando a BVC.
 
-Com isso é possível derivar um princípio de indução (\coqinline{term_aeq_rect}) $\alpha$-estrutural para propriedades $\alpha$-compatíveis (\coqinline{αCompat}):
-\begin{coqcode}
+Com isso, é possível derivar um princípio de indução (\coqinline{term_aeq_rect}) $\alpha$-estrutural para propriedades $\alpha$-compatíveis (\coqinline{αCompat}):
+\begin{coqcode*}{linenos=true}
 Definition term_aeq_rect:
   ∀ P: Λ → Type, αCompat P →
     (∀ a, P 'a) →
@@ -79,8 +92,8 @@ Definition term_aeq_rect:
     {L & ∀ m a, a ∉ L → P m → P (\a ⋅ m)} →
     ∀ m, P m.
 Proof. (* ... *) Qed.
-\end{coqcode}
-Para simplificação, omito a definição dos termos do \lcalc~(\coqinline{Λ}), representada pelas notações: \coqinline{'a} para variável, \coqinline{m × n} aplicação e \coqinline{\a ⋅ m} abstração. A definição \coqinline{term_aeq_rect} é bem similar ao princípio de indução na estrutura dos termos do \lcalc, com exceção do caso da abstração. A notação \coqinline{{a: A & T a}} introduz um tipo $\Sigma$, ou subconjunto, com \coqinline{T: A → Type}. Sua interpretação depende se estamos utilizando como princípio de indução ou recursão. No caso da indução, temos a garantia de que a variável ligada é suficientemente fresca para um conjunto de nomes \coqinline{L}. Já para recursão, ela permite escolher um nome diferente do conjunto, fornecido pelo usuário, em meio a recursão, como pode ser visto abaixo, no operador de recursão \coqinline{LIt}, que sempre produz funções fortemente $\alpha$-compatíveis (\coqinline{LItStrongCompat}):
+\end{coqcode*}
+Para simplificação, omito a definição dos termos do \lcalc~(\coqinline{Λ}), representada pelas notações: \coqinline{'a} para variável, \coqinline{m × n} aplicação e \coqinline{\a ⋅ m} abstração. A definição \coqinline{term_aeq_rect} é bem similar ao princípio de indução/recursão estrutural dos termos do \lcalc, com exceção do caso da abstração (linha 5), na qual introduze-se um tipo $\Sigma$ com notação \coqinline{{a: A & T a}}. \coqinline{term_aeq_rect} pode ser utilizado tanto como princípio de indução quanto um combinador de recursão. No caso da indução, sabemos que existe \coqinline{L} tal que a variável ligada é fresca. Já para o combinador de recursão, o tipo $\Sigma$ permite o usuário fornecer um conjunto de variáveis a serem evitados, isto é, a cada chamada recursiva, o combinador troca as variáveis ligadas por outras não contidas em \coqinline{L}. Afim de facilitar o uso de \coqinline{term_aeq_rect} como combinador de recursão, definimos o operador \coqinline{LIt}. Para utiliza-lo  necessário especificar as funções para cada construtor do \lcalc: \coqinline{fvar}, \coqinline{fapp} e \coqinline{fabs} e um conjunto \coqinline{L} de nomes a serem evitados.
 \begin{coqcode}
 Definition LIt {A: Type} (L: nameset) (l: Λ)
            (fvar: name → A) (fapp: A → A → A) (fabs: atom → A → A) : A :=
@@ -89,28 +102,29 @@ Definition LIt {A: Type} (L: nameset) (l: Λ)
 Lemma LItStrongCompat {A} fvar fapp fabs L:
   αStrongCompat (@LIt A fvar fapp fabs L).
 \end{coqcode}
-Para utilizar o princípio é necessário definir as funções para cada construtor do \lcalc: \coqinline{fvar}, \coqinline{fapp} e \coqinline{fabs} e um conjunto \coqinline{L} de nomes a serem evitados. Por exemplo, a substituição de termos é definida como:
+Conseguimos provar, também, que \coqinline{LIt} sempre produz funções fortemente $\alpha$-compatíveis (\coqinline{LItStrongCompat}). Como exemplo, podemos definir a substituição de termos do \lcalc~da seguinte maneira:
 \begin{coqcode}
 Definition subst_term (M N: Λ) (a: name): Λ :=
-  let L := ({a} ∪ fv N ∪ fv M) in (* fv = support *)
+  let L := ({a} ∪ fv N ∪ fv M) in (* fv = variáveis livres *)
   @LIt Λ (λ b, if decide (a = b) then N else 'b) App Abs L M.
 Notation " '[' a ':=' N ']' M " := (subst_term M N a)
 \end{coqcode}
-No caso da abstração não é necessário verificar a captura de variável livre, pois temos a garantia de que as variáveis ligadas serão sempre diferentes do conjunto \coqinline{L}, portanto passamos como argumento seu construtor \coqinline{Abs}, para propagar a recursão ao corpo da abstração.
+No caso da abstração não é necessário verificar a captura de variável livre, pois temos a garantia de que as variáveis ligadas serão sempre diferentes do conjunto \coqinline{L}, portanto passamos como argumento seu construtor \coqinline{Abs}, para propagar a recursão ao corpo da abstração. A título de exemplo, supondo a aplicação da substituição a uma abstração: $[a := N](\lambda a . M)$. Esta expande para $\lambda (\langle a~x \rangle a) . ((\langle a~x \rangle M)[a := N])$, com $x \notin L$. Por estarmos trocando todas as variáveis ligadas por variáveis frescas, temos a segurança de que não haverá captura de variável pela substituição. 
 
-Infelizmente, a simplicidade aparente do método esconde alguns problemas. Algumas demonstrações tornam-se longas e complexas, com aplicações não triviais de transitividade, o que dificulta bastante a automação da técnica. Isto complica a aplicação em formalizações que contem mais de um sistema, acarretando em repetição de código. Apesar das limitações, o grande triunfo do método é poder utilizar a igualdade padrão do Coq, na permutação e maioria das provas, eliminando a necessidade de \setoids, simplificando aplicações de reescrita.
+Infelizmente, a simplicidade aparente do método esconde alguns problemas. Algumas demonstrações tornam-se longas e complexas, com aplicações não triviais de transitividade, o que dificulta bastante a automação da técnica. Este fato atrapalha no uso de formalizações com múltiplas gramáticas, pois a maioria das definições, como \coqinline{term_aeq_rect}, precisam ser completamente redefinidas manualmente para cada sistema.
 
 \section{Choudhury}\label{sec:choudhury}
-O método de Copello, apesar de simples e direto, introduz repetição de código e complexidade com a introdução de novas estrutura a formalização. Uma possível solução é seria o desenvolvimento de uma biblioteca de conjuntos nominais, encapsulando e abstraindo conceitos, afim reduzir a reutilização de código e mecanizar a implementação de Copello.
+Apesar de simples e direto, o método de Copello, introduz repetição de código e complexidade com a introdução de novas estrutura a formalização. Uma solução seria o desenvolvimento de uma biblioteca de conjuntos nominais, possibilitando a automatização da metodologia.
 
-Na busca de desenvolvimentos, e bibliotecas, de conjuntos nominais, em assistentes de provas, pouco foi encontrado, com exceção dos trabalhos produzidor por Urban e seu grupo de métodos nominais\footnote{\textit{Nominal Methods Group} \url{https://nms.kcl.ac.uk/christian.urban/Nominal/}} \cite{Urban2008,Urban2005,Urban2006,Huffman2010,Urban2011}, e a dissertação de mestrado de Choudhury, sob orientação de Pitts \cite{Choudhury2015}. Entretanto qualifico os trabalhos do Urban como formalizações das \textbf{técnicas} nominais, pois estão interessados apenas na aplicação das ideias centrais da teoria nominal em assistentes, assim como Copello. O que diferencia ambos os projetos é a aptidão de mecanização e automação do pacote nominal de Urban. Dessa busca, o único trabalho que realmente propunha formalizar a noção de conjuntos nominais foi Choudhury, com uma representação \textbf{construtiva} no assistente de provas Agda \cite{Bove2009}. 
+Na busca de desenvolvimentos, e bibliotecas, de conjuntos nominais, em assistentes de provas, pouco foi encontrado, com exceção dos trabalhos produzidor por Urban e seu grupo de métodos nominais\footnote{\textit{Nominal Methods Group} \url{https://nms.kcl.ac.uk/christian.urban/Nominal/}} \cite{Urban2008,Urban2005,Urban2006,Huffman2010,Urban2011}, e a dissertação de mestrado de Choudhury, sob orientação de Pitts \cite{Choudhury2015}. Entretanto,
+podemos qualificar os trabalhos do Urban como formalizações de \textbf{técnicas} nominais, pois estão interessados apenas na aplicação das ideias centrais da teoria nominal em assistentes de provas, assim como Copello. O que diferencia ambos os projetos é a aptidão de mecanização e automação do pacote nominal de Urban. Dessa busca, o único trabalho que realmente propõe formalizar a noção de conjuntos nominais é \cite{Choudhury2015}, com uma representação \textbf{construtiva} no assistente de provas Agda \cite{Bove2009}. 
 
 %É importante frisar o construtivo, pois na teoria nominal é incompatível em lógicas construtivas, isto se deve ao fato de o menor suporte finito ser não construtivo \cite{Swan2016,Swan2017}.
 
-Meu desenvolvimento segue, basicamente, o trabalho de Choudhury, com algumas exceções. A principal é a fundamentação utilizada para formalizar conjuntos nominais. Choudhury opta por utilizar teoria de categorias, entretanto a falta de uma biblioteca robusta e livre de axiomas de categorias em Coq, impossibilitou seguir por este caminho\footnote{\fabricio{Falar pq? Problemas de inconsistencia de universos causado por categorias grandes?}}. Outros desvios propostos da representação de Choudhury, menos relevantes, serão introduzidos ao longo do capítulo.
+Nosso desenvolvimento, segue basicamente, o trabalho de Choudhury, com algumas exceções. A principal é a fundamentação utilizada para formalizar conjuntos nominais. Choudhury opta por utilizar teoria de categorias, entretanto a falta de uma biblioteca de categorias em Coq, robusta e livre de axiomas, impossibilitou seguir por este caminho. Por exemplo, única teoria livre de axiomas \cite{Wiegley}, desenvolvida para versão 8.8.2 do Coq, possui muitos problemas de inconsistência de universos, na versão utilizada neste trabalho (8.13.2), possivelmente relacionado a sua formalização de categorias grandes. Outras diferenças propostas à representação de Choudhury, menos relevantes, serão introduzidos ao longo da seção.
 
 \subsection{Ação de permutação}
-Afim de garantir que a definição de permutações (seção \ref{sec:atomos-permutacao}) realmente implementa permutações, estabeleço uma instância de \coqinline{Group} (seção \ref{sec:classes-setoids}) para \coqinline{perm}, com a concatenação como operador binário, reversão de lista como função reversa e lista vazia como elemento neutro:
+Afim de garantir que a definição de permutações (seção \ref{sec:atomos-permutacao}) realmente implementa permutações, definimos uma instância de \coqinline{Group} (seção \ref{sec:classes-setoids}) para \coqinline{perm}, com a concatenação como operador binário, reversão de lista como função inversa e lista vazia como elemento neutro:
 \begin{coqcode}
 Instance perm_neutral: Neutral perm := @nil (name * name).
 Instance perm_operator: Operator perm := @app (name * name).
@@ -118,7 +132,7 @@ Instance perm_inverse: Inverse perm := @reverse (name * name).
 Instance PermGrp: Group perm. Proof. (* ... *) Qed.
 \end{coqcode}
 
-Para ação de permutação, desvio um pouco da metodologia de colocar classes operacionais como parâmetros implícitos generalizados na definição de classes predicados (seção \ref{sec:classes}), como pode ser visto na definição de ação de grupo:
+Para ação de permutação, desviamos um pouco da metodologia (seção \ref{sec:classes}) de colocar classes operacionais como parâmetros implícitos generalizados, na definição da classe predicado ação de grupo:
 \begin{coqcode*}{linenos=true}
 Class Action A X := action: A → X → X.    Infix "•" := action.
 Class GAction `(Group G) (X: Type) `{Act: Action G X, Equiv X}: Prop := {
@@ -132,7 +146,7 @@ Class PermAct X := prmact :> Action perm X.
 Class Perm (X : Type) `{P : PermAct X, Equiv X} := 
    prmtype :> GAction PermGrp X (Act := @prmact X P).
 \end{coqcode*}
-Na linha 2, grupo é um parâmetro explícito generalizado \coqinline{`(Group G)}, ou seja, o parâmetro para uma instância de grupo é explícita, enquanto o resto dos parâmetros de grupo são introduzidos implicitamente. Isto tem um motivo semântico, pois é a de um grupo sobre uma tipo, e prático, em razão de que sempre teremos uma prova de grupo disponível no contexto ao trabalhar com alguma ação. As linhas 3 e 4 são permitem reescritas no contexto da ação, respeitando as equivalências de grupo (\coqinline{≡@{G}}) e do tipo que sofre a ação (\coqinline{≡@{X}}). Enquanto as linhas 5 e 6 são os lemas usuais de ação de grupo a esquerda. Linhas 9--11 especializo ação de grupo para ação de permutação. A classe \coqinline{Perm} é justamente a definição de tipos de permutação definido por Urban em \cite{Urban2008}.
+Na linha 2, grupo é um parâmetro explícito generalizado \coqinline{`(Group G)}, ou seja, o parâmetro para a instância de grupo é explícita, enquanto o resto dos parâmetros (implícitos) de grupo são introduzidos implicitamente. Fazemos isso, pois queremos explicitar a parametrização de ação de grupo em relação a uma instância de grupo. Por exemplo, nas linhas 10--11 definimos tipos de permutação (\coqinline{Perm}) parametrizado por uma instância específica de grupo de permutação (\coqinline{PermGrp}). As linhas 3 e 4 permitem reescritas no contexto da operação de ação, respeitando as equivalências de grupo (\coqinline{≡@{G}}) e do tipo que sofre a ação (\coqinline{≡@{X}}). Enquanto as linhas 5 e 6 são as propriedades usuais de ação à esquerda de grupo. A classe \coqinline{Perm} é justamente a definição de tipos de permutação proposta em \cite{Urban2008}.
 
 %\subsubsection{Permutação sobre funções}
 %Instancias para nomes, listas e tuplas (pares) para \coqinline{Perm} são trivialmente demonstráveis, entretanto, funções prova-se mais desafiador. Choudhury percorre um caminho mais longo, entretanto viável quando um arcabouço de categorias está disponível, tratando funções como pares ordenados (tuplas) e definindo operadores de \textit{curry} e \textit{uncurry}. Aqui, opto pelo caminho direto, semelhante a Urban, definindo \coqinline{Perm (A → B)} ao invés de \coqinline{Perm (A , B)}. Entretanto, diferentemente a Urban, sem o uso \textit{setoids} seria impossível definir tal instância sem adição do axioma da extensionalidade funcional, o que acarretaria numa formalização não construtiva.
@@ -180,7 +194,7 @@ Na linha 2, grupo é um parâmetro explícito generalizado \coqinline{`(Group G)
 %\end{coqcode}
 
 \subsection{Conjuntos nominal}
-Conjuntos nominais são conjuntos de permutação na qual todos os membros são suportados. Por isso, a classe \coqinline{Nominal} definida abaixo, é uma simples extensão de \coqinline{Perm}, indicado pela propriedade \coqinline{nperm}:
+Conjuntos nominais são conjuntos de permutação na qual todos os membros são suportados. Por isso, a classe \coqinline{Nominal} definida abaixo, é uma extensão direta de \coqinline{Perm}, indicado pela propriedade \coqinline{nperm}:
 \begin{coqcode}
 Context (X: Type) `{Perm X}.
 Class Support A := support: A → nameset.
@@ -190,14 +204,13 @@ Class Nominal `{Support X}: Prop := {
       a ∉ (support x) → b ∉ (support x) → ⟨a,b⟩ • x ≡@{X} x
 }.
 \end{coqcode}
-Diferentemente de \coqinline{Group} e \coqinline{GAction}, a classe \coqinline{Nominal} é definida utilizando o mecanismo de seção e contexto do Coq. Através do vernacular \coqinline{Context}, Coq introduz ao contexto da definição o tipo \coqinline{X} e uma prova de que é um conjunto de permutação. Isso nos dá acesso a ação e relação de equivalência, definida por \coqinline{Perm X} e utilizada em \coqinline{support_spec}. Ao encerrar a seção, o assistente inclui, como argumentos implícitos à classe \coqinline{Nominal}, todos as propriedades e classes empregues na definição.
-Outra alternativa de especificação seria: \coqinline{Class Nominal (X: Type) `{Support X, Perm X}: Prop := {(* ... *)}}, entretanto estaríamos introduzindo uma redundância de \coqinline{Pemr X} desnecessária, e semanticamente não faria sentindo, apesar de não afetar provas posteriores. É um fenômeno semelhante a herança e composição em linguagens orientadas a objetos. \coqinline{Perm} como argumento designaria ``composição'' de classes, e como membro de classe aponta para herança. Como a semântica correta é no sentido de herança, definimos desta maneira.
+Diferentemente de \coqinline{Group} e \coqinline{GAction}, a classe \coqinline{Nominal} é definida utilizando o mecanismo de seção e contexto do Coq. Através do vernacular \coqinline{Context}, Coq introduz (explícito) o tipo \coqinline{X} e uma prova (implícita) de que é um conjunto de permutação. Isso nos dá acesso a ação e a relação de equivalência, definida por \coqinline{Perm X}, que é posteriormente utilizada em \coqinline{support_spec}. Ao encerrar a seção, o assistente inclui, a lista de argumentos implícitos da classe \coqinline{Nominal}, todos os parâmetros introduzidos no contexto. Outra alternativa de especificação seria: \coqinline{Class Nominal (X: Type) `{Support X, Perm X}: Prop := {(* ... *)}}, entretanto estaríamos introduzindo uma redundância de \coqinline{Perm X} desnecessária, além de não ter sentido semântico, apesar de não afetar provas posteriores. É um fenômeno semelhante a herança e composição em linguagens orientadas a objetos. \coqinline{Perm} como parâmetro designaria uma ``composição'' de classes, enquanto como membro de classe indicaria uma relação de herança.
 
 \subsubsection{Instâncias de conjuntos nominais e permutação}
-Tendo definido a classe nominal, podemos começar a mostrar algumas instâncias triviais da mesma. Para mostrar que uma instância nominal para um tipo qualquer \coqinline{X}, seguimos os seguintes passos: (1) definir uma relação de equivalência para \coqinline{X}, ou seja, mostrar instâncias \coqinline{eqX: Equiv X} e \coqinline{Equivalence eqX}; (2) estipular uma ação de permutação \coqinline{PermAct X} com uma prova de que respeita as propriedades da mesma \coqinline{Perm X}; (3) definir suporte (\coqinline{Support X}) e finalmente mostrar que todo elemento é suportado (\coqinline{Nominal X}). A seguir apresento algumas instâncias interessantes de conjuntos nominais e conjuntos de permutação.
+Afim de apresentar uma instância \coqinline{Nominal} para um tipo qualquer \coqinline{X}, seguimos os seguintes passos: (1) definir uma relação de equivalência para \coqinline{X}, ou seja, mostrar instâncias \coqinline{eqX: Equiv X} e \coqinline{Equivalence eqX}; (2) estipular uma ação de permutação \coqinline{PermAct X} com uma prova de que respeita as propriedades da mesma \coqinline{Perm X}; (3) definir suporte (\coqinline{Support X}) e finalmente mostrar que todo elemento é suportado (\coqinline{Nominal X}). A seguir apresentamos algumas instâncias interessantes de \coqinline{Nominal} e \coqinline{Perm}.
 
 \begin{description}
-	\item [Bool] é trivialmente nominal, com igualdade sintática como equivalência, ação e suporte vazios (o elemento sintático ``\coqinline{_}'' indica, ao Coq, que o parâmetro não será utilizado.):
+	\item [Bool] é trivialmente nominal, com igualdade sintática como equivalência, ação equivale a função identidade com dois parâmetros, na qual ignora-se o primeiro, e suporte vazio:
 	\begin{coqcode}
 Instance bool_equiv: Equiv bool := λ b1 b2, b1 = b2.
 Instance bool_act: Action bool := λ _ b, b.
@@ -206,27 +219,27 @@ Instance bool_supp: Support bool := ∅.
 Instance bool_nom: Nominal bool. Proof. (* ... *) Qed.
 	\end{coqcode}
 	
-	\item[Pares (ou tuplas)] são representados pela sintáxe: \coqinline{(a,b)} com \coqinline{a} e \coqinline{b} dois tipos quaisquer. As funções \coqinline{fst} e \coqinline{snd} extraem, respectivamente, o primeiro e segundo elemento do par. Dois pares são equivalentes, quando seus elementos são equivalentes:
+	\item[Pares (ou tuplas)] são representados pela sintaxe: \coqinline{(a,b)} sendo \coqinline{a} e \coqinline{b} termos Gallina. As funções \coqinline{fst} e \coqinline{snd} são operadores de projeção, respectivamente para o primeiro e segundo elemento do par. A equivalência para pares é dado quando suas projeções são equivalentes:
 	\begin{coqcode}
 Instance pair_equiv `{Equiv X, Equiv Y}: Equiv (X * Y) :=
    λ '(x1,y1) '(x2,y2), (x1 ≡@{X} x2) ∧ (y1 ≡@{Y} y2).
 	\end{coqcode}
-	Ação sobre um par é a propagação da mesma para seus membros:
+	Ação sobre um par é a propagação da mesma para suas projeções:
 	\begin{coqcode}
 Instance pair_act `{Action X, Action Y}: Action (X * Y) :=
    λ (p: perm) '(x,y), (p • x, p • y).
 	\end{coqcode}
-	Tendo definido equivalência e ação, podemos mostrar que par é um conjunto de permutação sabendo que seus membros também são:
+	Tendo definido equivalência e ação, podemos mostrar que par é um tipo de permutação quando suas projeções também são:
 	\begin{coqcode}
 Instance pair_perm `{Perm X, Perm Y}: Perm (X * Y).
 Proof. (* ... *) Qed.
 	\end{coqcode}
-	Suporte é a união dos suportes dos membros:
+	Suporte é definido como a união dos suportes das projeções:
 	\begin{coqcode}
 Instance pair_supp `{Support X, Support Y}: Support (X * Y) :=
    λ '(x,y), (support x) ∪ (support y)
 	\end{coqcode}
-	E finalmente, assim como \coqinline{Perm}, mostramos que par é um conjunto nominal, desde que seus membros também sejam:
+	E finalmente, assim como \coqinline{Perm}, mostramos que par é um tipo nominal, desde que seus membros também sejam:
 	\begin{coqcode}
 Instance pair_nom `{Nominal X, Nominal Y}: Nominal (X * Y).
 Proof. (* ... *) Qed.	
@@ -236,7 +249,7 @@ Proof. (* ... *) Qed.
 	\begin{coqcode}
 Instance perm_fun `{Perm X, Perm Y}: Perm (X → Y).
 	\end{coqcode}
-	Para contornar este problema, precisamos definir o subconjunto de funções respeitosas. Utilizo uma solução proposta na biblioteca Iris, um \textit{framework} de verificação de programas concorrentes através de lógica de separação \cite{Jung2015,Jung2016}. Definimos um registro que contem uma função (\coqinline{f_car}) associado a um certificado de respeitosa (\coqinline{f_proper}):
+	Para contornar este problema, precisamos definir o subconjunto de funções respeitosas. Utilizo uma solução proposta pelo projeto Iris\footnote{\url{https://iris-project.org/}}, um \textit{framework} de verificação de programas concorrentes através de lógica de separação \cite{Jung2015,Jung2016}. Definimos um registro que contem uma função (\coqinline{f_car}) associado a um certificado de respeitosa (\coqinline{f_proper}):
 	\begin{coqcode}
 Context (A B: Type) `{Perm A, Perm B}.
 Record proper_perm_fun: Type := ProperPermFun {
