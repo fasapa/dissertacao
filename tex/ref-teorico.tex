@@ -1,14 +1,12 @@
 \chapter{Referencial Teórico}\label{chp:ref-teorico}
 
-Neste capítulo apresentamos os conceitos e definições fundamentais utilizados neste projeto. Começamos pelo conceito de nome, seguido de permutações, pilares da teoria nominal \cite{Gabbay2002,Pitts2003,Pitts2013}, e finalizamos com conjuntos nominais, também chamados de tipos nominais por alguns autores \cite{Urban2008,Choudhury2015}, e suporte.
+Neste capítulo apresentamos os conceitos e definições fundamentais utilizados neste trabalho. Começamos pelo conceito de nome, seguido de permutações, pilares da teoria nominal \cite{Gabbay2002,Pitts2003,Pitts2013}, e finalizamos com conjuntos nominais, também chamados de tipos nominais por alguns autores \cite{Urban2008,Choudhury2015}, incluindo o conceito de suporte.
 
-Nominal sets capture the notion of name (in)dependence through a simple, and uniform, metatheory based on name permutations. By enriching a structure with (group) action ofpermutations is possible to define such notion of dependence, where the set of names astructure depends on is called support while its complement is formed by the so-calledfresh names. In short, nominal sets gives us the tools to express name dependence for anyelement of it, only by the means of name permutation, i.e.: if any permutation changes aname from the support of an element, then it’ll change such element.  (ainda precisa derevisao geral no paragrafo)
-
-Nomes são uteis por seus identificadores, assim como ponteiros em C/C++, ou referencias em Java ou C\#. Sua estrutura interna é abstrata, irrelevante e indivisível. Por isso são denominam como átomos. Ao contrário de átomos na química, assumimos um conjunto contável\footnote{Não é estritamente necessário que o conjunto de nomes seja contável, veja \cite[Exercício 6.2, página 109]{Pitts2013}. Como neste trabalho nomes são implementados como números naturais, incluo contável como uma propriedade bônus.} infinito de nomes, com igualdade decidível, denominado $\nameset$, representado por pelas letras minúsculas no início do alfabeto: $a$, $b$, etc. A teoria nominal captura a noção de (in)dependência de nomes através de uma metateoria, simples e uniforme, baseada em permutações de nomes.
+Nomes são úteis por seus identificadores, assim como ponteiros em C/C++, ou referencias em Java ou C\#. Sua estrutura interna é abstrata, irrelevante e indivisível. Por isso são denominadas átomos. Assumimos um conjunto contável\footnote{Não é estritamente necessário que o conjunto de nomes seja contável, veja \cite[Exercício 6.2, página 109]{Pitts2013}.} infinito de nomes, com igualdade decidível, denominado $\nameset$, representado pelas letras minúsculas no início do alfabeto: $a$, $b$, etc. A teoria nominal captura a noção de (in)dependência de nomes através de uma metateoria, simples e uniforme, baseada em permutações de nomes.
 
 As permutações são funções bijetoras, de um conjunto para si mesmo, na qual formam um grupo de simetria, através da composição de funções ($\circ$) como operação binária. Uma propriedade de permutações, é que estas podem ser decompostas em 2-ciclos, também chamados de transposição ou \textit{swap}:
-\begin{definicao}[Transposição de nomes ou \textit{Swap}]\label{def:swap}
-	Transposições são permutações 2-ciclos, representando por $\langle a~b \rangle : X \rightarrow X$ e definido como:
+\begin{definicao}[Transposição ou \textit{Swap}]\label{def:swap}
+	Seja $X$ um conjunto, tal que $a~b \in X$. Transposições são permutações 2-ciclos, representando por $\langle a~b \rangle : X \rightarrow X$ e definido como:
 	\begin{equation}
 		\langle a~b \rangle ~c \triangleq 
 		\begin{cases}
@@ -18,7 +16,7 @@ As permutações são funções bijetoras, de um conjunto para si mesmo, na qual
 		\end{cases}
 	\end{equation} 
 \end{definicao}\noindent
-Fazendo $X = \nameset$, obtemos a operação de transposição de nomes, essencialmente uma função que troca nomes. O interesse de utilizar transposição como operação básica de alteração sintática, ao contrário da substituição de termos, em gramáticas com estruturas ligantes, está no fato não dependerem da definição de variável livre ou ligada e serem imunes a captura de variáveis livres \cite{Pitts2003}. 
+Fazendo $X = \nameset$, obtemos a operação de transposição de nomes, essencialmente uma função que troca nomes. O interesse em utilizar transposição como operação básica de alteração sintática, em gramáticas com estruturas ligantes, ao contrário da substituição de termos, está no fato de não dependerem da definição de variável livre ou ligada e serem imunes a captura de variáveis livres \cite{Pitts2003}. 
 
 Denotamos por $\permset = (\nameset, \circ)$, o grupo de permutação finitas sobre $\nameset$, formado pela composição de transposições, com a função identidade como elemento neutro. Reservo as letras minúsculas $p$, $q$, $r$ e $s$ para designar membros deste grupo. Permutações agem sobre conjuntos por meio da operação de ação (à esquerda) de grupo:
 \begin{definicao}[Ação de grupo]
@@ -42,14 +40,15 @@ Mas primeiramente, vamos discutir o significado informal de (in)dependência, no
 \end{definicao}\noindent
 Ou seja, se uma permutação $p$, não modifica os nomes do suporte $S$ de $x$, então essa mesma permutação não terá efeito em $x$. Ao contrário, caso a permutação modifique algum elemento de $S$ então ela modificará $x$. A elegância da definição está no fato de fornecer uma forma simples de especificar dependência de nomes, apenas através da noção de permutação de nomes, 
 
-Dois pontos extras sobre a definição de suporte: (1) é importante que o suporte seja sempre finito. Se $S = \nameset$, então não é possível obter novos nomes frescos, afinal, foi por isso que estipulamos um conjunto infinito para nomes.
-(2) Podem existir mais de um suporte ($S_1$ e $S_2$) para um elemento de um conjunto nominal. Nestes casos é possível mostrar que $S_1 \cap S_2$ também é um suporte \cite[Proposição 2.3]{Pitts2013}. O que nos leva a definição de menor suporte e frescor, até agora informal:
+Gostaríamos de ressaltar dois pontos extras sobre a definição de suporte: (1) é importante que seja sempre finito. Caso $S = \nameset$, em suporte, então não é possível obter novos nomes frescos, pois esgotaram-se as opções.
+(2) Podem existir mais de um suporte ($S_1$ e $S_2$) para um único elemento. Nestes casos é possível mostrar que $S_1 \cap S_2$ também é um suporte \cite[Proposição 2.3]{Pitts2013}. O que nos leva a definição de menor suporte:
 \begin{definicao}[Menor suporte]
 	Seja $X$ um conjunto de permutação, o menor suporte é dado pela intersecção de todos os suportes de $x \in X$:
 	\begin{equation}\label{eq:menor-suporte}
 		\text{supp}(x) \triangleq \bigcap \left\{ S \mid S \text{ suporta } x \right\}
 	\end{equation}	
-\end{definicao}
+\end{definicao}\noindent
+e frescor, até agora utilizado informalmente:
 \begin{definicao}[Frescor]
 	Dado dois conjuntos de permutação $X$ e $Y$, dizemos que $y \in Y$ é fresco em $x \in X$, denotado por $y \# x$, se:
 	\begin{equation}\label{eq:frescor-supp}
@@ -59,6 +58,10 @@ Dois pontos extras sobre a definição de suporte: (1) é importante que o supor
 	\begin{equation}\label{eq:frescor}
 		y \# x \leftrightarrow y \notin \text{supp}(x)
 	\end{equation}
+\end{definicao}\noindent
+Assim, temos todas as ferramentas necessárias para definir conjuntos nominais:
+\begin{definicao}[Conjunto nominal]
+	Conjunto nominal é um conjunto de permutação na qual todos elementos possuem menor suporte.
 \end{definicao}
 
-\fabricio{Só falta conjuntos nominais e funções equivariantes. Colocar formalização construtiva aqui? Acho que não}
+%\fabricio{FALAR SOBRE O PROBLEMA DA CONSTRUTIVIDADE VS MENOR SUPORTE AQUI OU NA FORMALIZAÇÃO?}
