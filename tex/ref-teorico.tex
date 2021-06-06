@@ -32,13 +32,13 @@ Denotamos por $\permset = (\nameset, \circ)$ o grupo de permutações finitas so
 	Ação de permutação é uma ação definida pelo grupo $\permset$. Conjunto de permutação é aquele dotado de uma ação de permutação.
 \end{definicao}\noindent
 
-Ao enriquecer um conjunto com uma ação de permutação (definição \ref{def:acao-permutacao}) conseguimos estabelecer uma noção de dependência de nomes, aonde o conjunto de nomes ao qual uma estrutura depende é chamado de \textbf{suporte}, enquanto seu complemento é denominado de nomes frescos.
+Ao enriquecer um conjunto com uma ação de permutação (Definição \ref{def:acao-permutacao}) conseguimos estabelecer uma noção de dependência de nomes, aonde o conjunto de nomes ao qual uma estrutura depende é chamado de \textbf{suporte}, enquanto seu complemento é denominado de nomes frescos.
 Mas primeiramente, vamos discutir o significado informal de (in)dependência, no contexto do \lcalc, pois seu significado depende da gramática e semântica em questão.
 
 O conjunto dos termos ($\Lambda$) do \lcalc~é dado pela gramática \cite{Hindley2008}, utilizando nomes no lugar de variáveis:
-\begin{equation*}
+\begin{equation}\label{eq:lambda}
 	M, N \in \Lambda ::= a \in \nameset \mid (M N) \mid (\lambda a . M)
-\end{equation*}
+\end{equation}
 aonde estamos utilizando nomes no lugar de variáveis, $(M N)$ representa a aplicação de dois termos e $(\lambda a . M)$ denota uma abstração. O conjunto de variáveis livres é definido como:
 \begin{definicao}[Variáveis livres e ligadas \cite{Hindley2008}]
 	O conjunto de variáveis livres é definido recursivamente na estrutura de um termo pela função $\text{FV}: \Lambda \rightarrow \nameset$, para $a \in \nameset$ e $M, N \in \Lambda$:
@@ -83,7 +83,7 @@ e frescor, até agora utilizado informalmente:
 	\end{equation}
 \end{definicao}\noindent
 Assim, temos todas as ferramentas necessárias para definir conjuntos nominais:
-\begin{definicao}[Conjunto nominal]
+\begin{definicao}[Conjunto nominal]\label{def:conjunto-nominal}
 	Conjunto nominal é um conjunto de permutação na qual todos elementos possuem menor suporte.
 \end{definicao}
 
