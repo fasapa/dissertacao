@@ -4,9 +4,9 @@
 O assistente de provas Coq \cite{Coq2021} é um sistema gerenciador de desenvolvimentos formais, composto por três linguagens: Gallina (especificação), Vernacular (comandos) e Ltac (metaprogramação). O vernacular define comandos que permitem interagir com o ambiente de provas, como adicionar definições, realizar consultas e alterar configurações do assistente. Ltac é utilizado para metaprogramação, sendo principalmente utilizada no desenvolvimento de táticas e automação. Por último, Gallina é uma linguagem funcional (de especificação) com tipos dependentes, na qual é implementado o Cálculo de Construções (Co)Indutivas \cite{Coquand1988,Coquand1990,PaulinMohring1993}. Para o desenvolvimento de provas, através do isomorfismo de Curry-Howard \cite{Soerensen2006}, Coq permite construir termos Gallina (programas), interativamente, por meio da aplicação de táticas. Ao final, o termo construído é enviado ao \textit{kernel} do Coq para verificação. A seguir, destaco alguns tópicos mais relevantes ao desenvolvimento deste trabalho.
 
 \section{Classes de tipos}\label{sec:classes}
-As classes de tipos em Coq, são semelhantes a implementação em Haskell \cite{Hall1996}, isto é, um mecanismo de polimorfismo \textit{ad-hoc} \cite{Wadler1989} em que funções podem ser aplicadas a diferentes argumentos, dependendo do seu tipo. No assistente de provas Coq, classes de tipos são açúcar sintático (\textit{syntax sugar}) para registros paramétricos dependentes e
+As classes de tipos em Coq, são semelhantes a implementação em Haskell \cite{Hall1996}, isto é, ambos um mecanismo de polimorfismo \textit{ad-hoc} \cite{Wadler1989} em que funções podem ser aplicadas a diferentes argumentos, dependendo do seu tipo. No assistente de provas Coq, classes de tipos são açúcar sintático (\textit{syntax sugar}) para registros paramétricos dependentes e
 %similar a classes em C++ ou Java. 
-contam, também, com um sistema de busca de provas e inferência, similar a Prolog. Por consequência, classes de tipos são cidadãos de primeira classe, dessa forma restrições de classe, são apenas parâmetros implícitos \cite{Sozeau2008}. Por exemplo, em Haskell, a classe de tipos ordenados depende da classe de tipos com igualdade \cite{HaskellOrd}, representado: \haskellinline{Eq a => Ord a}. Afim de obter o mesmo efeito em Coq, supondo a existência das mesmas classes, basta passarmos como parâmetros a classe \haskellinline{Eq} a classe \haskellinline{Ord}: \coqinline{Ord (a: Type) (e: Eq a)}. Logo, classes de tipos em Coq são mais poderosas que sua contrapartida em Haskell. 
+contam, também, com um sistema de busca de provas e inferência, similar a Prolog. Por consequência, as classes de tipos são cidadãs de primeira classe, dessa forma restrições de classe são apenas parâmetros implícitos \cite{Sozeau2008}. Por exemplo, em Haskell, a classe de tipos ordenados depende da classe de tipos com igualdade \cite{HaskellOrd}, representado: \haskellinline{Eq a => Ord a}. Afim de obter o mesmo efeito em Coq, supondo a existência das mesmas classes, basta passarmos como parâmetros a classe \haskellinline{Eq} a classe \haskellinline{Ord}: \coqinline{Ord (a: Type) (e: Eq a)}. Logo, classes de tipos em Coq são mais poderosas que sua contrapartida em Haskell. 
 %Outro exemplo é a possibilidade de se definir múltiplas instâncias para o mesmo tipo: 
 %em Coq, pode-se definir múltiplas instâncias de monoide para os naturais, um para operações de soma outro para multiplicação. Em Haskell, o mesmo efeito só é possível definindo novos tipos (\haskellinline{Sum} e \haskellinline{Prod}) para cada instância de monoide \cite{HaskellMonoid}.
 
@@ -17,13 +17,13 @@ A igualdade padrão do Coq é sintática, definida pelo tipo indutivo \coqinline
 \begin{coqcode}
 Inductive eq (A: Type) (x: A): A → Prop := eq_refl: x = x.	
 \end{coqcode}
-O código acima define uma família de igualdades parametrizada pelo tipo \coqinline{A}. A única forma de construir uma prova \coqinline{a = b} é através do construtor \coqinline{eq_refl}, desde que \coqinline{a} e \coqinline{b} sejam intencionalmente, ou sintaticamente iguais. Igualdade intencional ocorre quando dois termos são convertíveis, isto é, são redutíveis entre sí, via regras de conversão do Coq: $\alpha$, $\beta$, $\iota$, $\delta$, $\zeta$ e $\eta$-expansão \cite{CoqConversion}.  Esta definição é bem útil para reescrita, como pode ser visto no princípio de indução/recursão gerado para \coqinline{eq}:
+O código acima define uma família de igualdades parametrizada pelo tipo \coqinline{A}. A única forma de construir uma prova \coqinline{a = b} é através do construtor \coqinline{eq_refl}, desde que \coqinline{a} e \coqinline{b} sejam intencionalmente, ou sintaticamente iguais \cite{Chlipala2013}. Igualdade intencional ocorre quando dois termos são convertíveis, isto é, são redutíveis entre sí, via regras de conversão do Coq: $\alpha$, $\beta$, $\iota$, $\delta$, $\zeta$ e $\eta$-expansão \cite{CoqConversion}.  Esta definição é bem útil para reescrita, como pode ser visto no princípio de indução/recursão gerado para \coqinline{eq}:
 \begin{coqcode}
 eq_rect: ∀ (A: Type) (x: A) (P: A → Type), P x → ∀ y: A, x = y → P y.
 \end{coqcode}
 pois permite reescrever termos, em qualquer contexto \coqinline{P}, desde que sejam intencionalmente iguais. 
 
-Especificações e formalizações podem apresentar objetos sintaticamente diferentes, não-convertíveis, mas que representam o mesmo objeto semanticamente, identificados por meio de uma relação de equivalência, por exemplo termos $\alpha$-equivalentes do \lcalc. Para estes casos, não podemos aplicar a família de táticas de reescrita do Coq, pois utilizam \coqinline{eq_rect} em sua implementação, o que acaba restringindo seu uso apenas à igualdade sintática. Uma solução ingênua seria tentar definir conjuntos quocientes, entretanto não é possível sem a adição de axiomas extras \cite{Chicli2003}, além de tornar o algoritmo de checagem de tipos indecidível \cite{Geuvers2002}. A alternativa é utilizar \textit{setoids}.
+Especificações e formalizações podem apresentar objetos sintaticamente diferentes, não-convertíveis, mas que representam o mesmo objeto semanticamente, identificados por meio de uma relação de equivalência, por exemplo termos $\alpha$-equivalentes do \lcalc. Para estes casos, não podemos aplicar a família de táticas de reescrita do Coq, pois utilizam \coqinline{eq_rect} em sua implementação, o que acaba restringindo seu uso apenas à igualdade sintática. Uma solução ingênua seria tentar definir conjuntos quocientes, entretanto não seria possível sem a adição de axiomas extras \cite{Chicli2003}, além de tornar o algoritmo de checagem de tipos indecidível \cite{Geuvers2002}. A alternativa é utilizar \textit{setoids}.
 
 Os \textit{setoids}, também conhecidos como conjuntos de Bishop \cite{Barthe2003,Bishop2012}, são estruturas formadas por um tipo equipado com uma relação de equivalência, geralmente implementados por meio de registros:
 \begin{coqcode}
@@ -33,7 +33,7 @@ Record Setoid (A: Type) := {
    prf: Equivalence equiv
 }
 \end{coqcode}
-O grande problema de \textit{setoids} é que na prática, o usuário tem que lidar constantemente com os detalhes da implementação. Por exemplo, supondo uma representação da classe de $\alpha$-equivalência para termos-$\lambda$, denotado por \coqinline{Λα}:
+O grande problema de \textit{setoids} é que, na prática, o usuário tem que lidar constantemente com os detalhes da implementação. Por exemplo, supondo uma representação da classe de $\alpha$-equivalência para termos-$\lambda$, denotada por \coqinline{Λα}:
 \begin{coqcode}
 Definition Λα: Setoid Λ := {| car := Λ; eqv: α; prf := _ |}.
 \end{coqcode}
@@ -47,7 +47,7 @@ Definition extract (t: Λα): Λα :=
    | Lam x b => {| car := b; eqv: t.eqv; prf := _ |}
    | _ => t.
 \end{coqcode}
-Observe que o usuário precisa extrair o tipo envolto no \textit{setoid}, já que não é possível realizar um casamento em tipos não indutivos, e reconstruir o \textit{setoid} no retorno da função. Este padrão de código, que envolve extração e reconstrução, se agrava quando há ocorrência de mais de um \textit{setoid}, conhecido como ``\textit{setoid hell}'', tornando-se bastante oneroso e complexo, pois introduz mais problemas do que soluções \cite{Altenkirch2017}.
+Observe que o usuário precisa extrair o tipo envolto no \textit{setoid}, já que não é possível realizar um casamento em tipos não-indutivos, e reconstruir o \textit{setoid} no retorno da função. Este padrão de código, que envolve extração e reconstrução, se agrava quando há ocorrência de mais de um \textit{setoid}, conhecido como ``\textit{setoid hell}'', tornando-se bastante oneroso e complexo, pois introduz mais problemas do que soluções \cite{Altenkirch2017}.
 
 \section{Classes de tipos e \textit{setoids}}\label{sec:classes-setoids}
 Afim de mitigar algumas dessas deficiências descritas na seção anterior, Coq define \textit{setoids} como uma classe de tipo:
@@ -64,7 +64,7 @@ Dessa forma, o usuário não precisa lidar diretamente com a relação e sua pro
 		\forall a~b \in X,~a \approx_X b \rightarrow f(a) \approx_Y f(b)
 	\end{equation*}
 \end{definicao}\noindent
-A próxima seção apresenta um conjunto de exemplos mais aprofundado, englobando classes de tipos, \textit{setoids} e reescrita generalizada.
+A próxima seção apresenta um conjunto de exemplos mais aprofundados, englobando classes de tipos, \textit{setoids} e reescrita generalizada.
 
 %\fabricio{MANDAR PARA FORMALIZAÇÃO.}
 %O emprego de \textit{setoids} neste projeto foi essencial para manter a formalização construtiva.

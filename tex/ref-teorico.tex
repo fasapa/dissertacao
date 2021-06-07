@@ -4,9 +4,12 @@ Neste capítulo apresentamos os conceitos e definições fundamentais utilizados
 
 Nomes são úteis por seus identificadores, assim como ponteiros em C/C++, ou referencias em Java ou C\#. Sua estrutura interna é abstrata, irrelevante e indivisível. Por isso são denominadas átomos. Assumimos um conjunto contável\footnote{Não é estritamente necessário que o conjunto de nomes seja contável, veja \cite[Exercício 6.2, página 109]{Pitts2013}.} infinito de nomes, com igualdade decidível, denominado $\nameset$, representado pelas letras minúsculas no início do alfabeto: $a$, $b$, etc. A teoria nominal captura a noção de (in)dependência de nomes através de uma metateoria, simples e uniforme, baseada em permutações de nomes.
 
-As permutações são funções bijetoras, de um conjunto para si mesmo, na qual formam um grupo de simetria, através da composição de funções ($\circ$) como operação binária. Uma propriedade de permutações, é que estas podem ser decompostas em 2-ciclos, também chamados de transposição ou \textit{swap}:
+As permutações são funções bijetoras, de um conjunto para si mesmo, na qual formam um grupo de simetria, através da composição de funções ($\circ$) como operação binária.
+Grupo, é um conjunto $G$ fechado sob uma operação binária $* : G \rightarrow G$, denotado por $\langle G, * \rangle$, que satisfaz as seguintes condições: a operação binária é associativa; existe um elemento $\varepsilon \in G$, chamado de neutro ou identidade, tal que para todo $g \in G$ temos $\varepsilon * g = g * \varepsilon = g$; e para cada $g \in G$ existe $g' \in G$, chamado de inversa, tal que $g*g' = g'*g = \varepsilon$ \cite{Fraleigh2002}. O elemento inverso pode ser obtido via uma função $f : G \rightarrow G$, chamada de função inversa, dessa forma a última condição é alterada para $g*f(g) = f(g)*g = \varepsilon$.
+
+Uma propriedade de permutações, é que estas podem ser decompostas em 2-ciclos, também chamados de transposição ou \textit{swap}:
 \begin{definicao}[Transposição ou \textit{Swap}]\label{def:swap}
-	Seja $X$ um conjunto, tal que $a~b \in X$. Transposições são permutações 2-ciclos, representando por $\langle a~b \rangle : X \rightarrow X$ e definido como:
+	Seja $X$ um conjunto, tal que $a~b \in X$. Transposições são permutações 2-ciclos, representado por $\langle a~b \rangle : X \rightarrow X$ e definido como:
 	\begin{equation}
 		\langle a~b \rangle ~c \triangleq 
 		\begin{cases}
@@ -32,14 +35,14 @@ Denotamos por $\permset = (\nameset, \circ)$ o grupo de permutações finitas so
 	Ação de permutação é uma ação definida pelo grupo $\permset$. Conjunto de permutação é aquele dotado de uma ação de permutação.
 \end{definicao}\noindent
 
-Ao enriquecer um conjunto com uma ação de permutação (Definição \ref{def:acao-permutacao}) conseguimos estabelecer uma noção de dependência de nomes, aonde o conjunto de nomes ao qual uma estrutura depende é chamado de \textbf{suporte}, enquanto seu complemento é denominado de nomes frescos.
+Ao enriquecer um conjunto com uma ação de permutação (Definição \ref{def:acao-permutacao}) conseguimos estabelecer uma noção de dependência de nomes, onde o conjunto de nomes ao qual uma estrutura depende é chamado de \textbf{suporte}, enquanto seu complemento é denominado de nomes frescos.
 Mas primeiramente, vamos discutir o significado informal de (in)dependência, no contexto do \lcalc, pois seu significado depende da gramática e semântica em questão.
 
 O conjunto dos termos ($\Lambda$) do \lcalc~é dado pela gramática \cite{Hindley2008}, utilizando nomes no lugar de variáveis:
 \begin{equation}\label{eq:lambda}
-	M, N \in \Lambda ::= a \in \nameset \mid (M N) \mid (\lambda a . M)
+	M, N \in \Lambda ::= a \mid (M N) \mid (\lambda a . M)
 \end{equation}
-aonde estamos utilizando nomes no lugar de variáveis, $(M N)$ representa a aplicação de dois termos e $(\lambda a . M)$ denota uma abstração. O conjunto de variáveis livres é definido como:
+onde estamos utilizando nomes no lugar de variáveis, ou seja $a \in \nameset$, $(M N)$ representa a aplicação de dois termos e $(\lambda a . M)$ denota uma abstração. O conjunto de variáveis livres é definido como:
 \begin{definicao}[Variáveis livres e ligadas \cite{Hindley2008}]
 	O conjunto de variáveis livres é definido recursivamente na estrutura de um termo pela função $\text{FV}: \Lambda \rightarrow \nameset$, para $a \in \nameset$ e $M, N \in \Lambda$:
 	\begin{equation*}
@@ -52,7 +55,7 @@ aonde estamos utilizando nomes no lugar de variáveis, $(M N)$ representa a apli
 		\text{BV}(\lambda a . M) = \text{BV}(M) \cup \{a\}
 	\end{equation*}
 \end{definicao}\noindent
-Dizemos que termos são $\alpha$-equivalentes, denotado $M \aeq N$, se estes diferem apenas nas variáveis ligadas.
+Dizemos que termos são $\alpha$-equivalentes, denotado por $M \aeq N$, se estes diferem apenas nos nomes das variáveis ligadas.
 
 Um termo, por exemplo $W = \lambda x. (xy)$, depende de todas as variáveis ($\text{BV}(W) \cup \text{FV}(W)$) contidas nele, pois a modificação de qualquer nome implica num novo termo, sintaticamente diferente, como $\lambda x. (xz)$ ou $\lambda z. (zy)$. Entretanto, se considerarmos termos módulo $\alpha$-equivalência, o conjunto de nomes dependentes são apenas as variáveis livres ($\text{FV}(W)$), pois continuando com nosso exemplo: $\lambda x. (xy) \not\aeq \lambda x. (xz)$, mas $\lambda x. (xy) \aeq \lambda z. (zy)$. Formalmente definimos suporte como:
 \begin{definicao}[Suporte]
@@ -61,7 +64,7 @@ Um termo, por exemplo $W = \lambda x. (xy)$, depende de todas as variáveis ($\t
 		\forall p \in \permset, ((\forall a \in S, p \action a = a) \rightarrow p \action x = x)
 	\end{equation}
 \end{definicao}\noindent
-Ou seja, se uma permutação $p$ não modifica os nomes do suporte $S$ de $x$, então essa mesma permutação não terá efeito em $x$. Ao contrário, caso a permutação não modifique algum elemento de $S$ então ela não modificará $x$. A elegância da definição está no fato de fornecer uma forma simples de especificar dependência de nomes, apenas através da noção de permutação de nomes.
+Ou seja, se uma permutação $p$ não modifica os nomes do suporte $S$ de $x$, então essa mesma permutação não terá efeito em $x$. Ao contrário, qualquer $p$ que modifique $x$ modifica algum nome em seu suporte. A elegância da definição está no fato de fornecer uma forma simples de especificar dependência de nomes, apenas através da noção de permutação de nomes e a noção de suporte.
 
 Gostaríamos de ressaltar dois pontos extras sobre a definição de suporte: (1) é importante que seja sempre finito. Caso $S = \nameset$, em suporte, então não é possível obter novos nomes frescos, pois esgotaram-se as opções.
 (2) Podem existir mais de um suporte ($S_1$ e $S_2$) para um único elemento. Nestes casos é possível mostrar que $S_1 \cap S_2$ também é um suporte \cite[Proposição 2.3]{Pitts2013}. O que nos leva a definição de menor suporte:
@@ -86,5 +89,8 @@ Assim, temos todas as ferramentas necessárias para definir conjuntos nominais:
 \begin{definicao}[Conjunto nominal]\label{def:conjunto-nominal}
 	Conjunto nominal é um conjunto de permutação na qual todos elementos possuem menor suporte.
 \end{definicao}
+
+Apresentamos neste capítulo a teoria clássica de conjuntos nominais. No restante do texto começamos a explorar diferentes possibilidades de implementação de conjuntos nominais, em assistentes de provas construtivos, com teoria de tipos dependentes, mais especificamente no Coq, apresentado no Capítulo \ref{chp:metodologia}. 
+
 
 %\fabricio{FALAR SOBRE O PROBLEMA DA CONSTRUTIVIDADE VS MENOR SUPORTE AQUI OU NA FORMALIZAÇÃO?}
